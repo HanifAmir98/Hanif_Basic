@@ -256,8 +256,8 @@
 
             // Output
             document.getElementById('result').innerHTML =
-                `<div><span class='result-label'>End Work Time:</span> ${formatTime(endHour, endMinute)}</div>` +
-                `<div style='margin-top:12px;'><span class='result-label'>End OT Time:</span> ${formatTime(otHour, otMinute)}</div>`;
+                `<b>End Work Time:</b> ${formatTime(endHour, endMinute)}<br>` +
+                `<b>End OT Time:</b> ${formatTime(otHour, otMinute)}`;
         }
 
         // OT Settings Modal Logic
