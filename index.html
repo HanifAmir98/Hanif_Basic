@@ -70,7 +70,7 @@
             position: fixed;
             top: 0;
             right: 0;
-            width: 320px;
+            width: 200px;
             height: 100vh;
             background: #fff;
             box-shadow: -2px 0 16px rgba(0,0,0,0.08);
@@ -136,10 +136,10 @@
     <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
     <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
         <div style="display:flex; width:100%; align-items:center; position:relative;">
-            <h3 style="color: #2d3a4a; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Loan Part Supplier Contact</h3>
+            <h3 style="color: #2d3a4a; margin: 2px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Supplier Contact</h3>
         </div>
         <div id="contact-list" style="display:none;"></div>
-        <button id="add-contact-btn" style="margin-top: 10px; font-size: 1.2em; background: #388e3c; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display:none;">+</button>
+        <button id="add-contact-btn" style="margin-top: 10px; font-size: 1.2em; background: #388e3c; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display:inline-block;">+</button>
         <form id="contact-form" style="display:none; margin-top: 12px;">
             <input type="text" id="contact-pic" placeholder="PIC Name" required style="margin-bottom:4px; width: 120px;">
             <input type="text" id="contact-company" placeholder="Company" required style="margin-bottom:4px; width: 120px;">
@@ -224,12 +224,36 @@
             }
             list.innerHTML = contacts.map((c, i) =>
                 `<div style='border:1px solid #e0e0e0; border-radius:6px; padding:8px 10px; margin-bottom:7px; background:#f9f9f9; position:relative;'>
-                    <b>PIC:</b> ${c.pic} <br>
-                    <b>Company:</b> ${c.company} <br>
-                    <b>Brand:</b> ${c.brand} <br>
-                    <b>Contact:</b> <a href='tel:${c.number}'>${c.number}</a><br>
-                    <button onclick='editContact(${i})' style='background:#ffa726; color:#fff; border:none; border-radius:4px; padding:2px 8px; margin-right:6px; margin-top:6px;'>Edit</button>
-                    <button onclick='deleteContact(${i})' style='background:#e53935; color:#fff; border:none; border-radius:4px; padding:2px 8px; margin-top:6px;'>Delete</button>
+                    <div>
+                        <b>PIC:</b> ${c.pic} <br>
+                        <b>Company:</b> ${c.company} <br>
+                        <b>Brand:</b> ${c.brand} <br>
+                        <b>Contact:</b> <span id='contact-num-${i}' style='user-select:all;'>${c.number}</span>
+                    </div>
+                    <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
+                        <button onclick='copyContactNumber(${i})' title='Copy Number' style='background:none; border:none; cursor:pointer; padding:2px;'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' style='vertical-align:middle;'>
+                                <rect x='6' y='6' width='12' height='14' rx='2' fill='#888'/>
+                                <rect x='4' y='4' width='12' height='14' rx='2' stroke='#888' stroke-width='1.5' fill='none'/>
+                            </svg>
+                        </button>
+                        <button onclick='editContact(${i})' title='Edit' style='background:none; border:none; cursor:pointer; padding:2px;'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                                <path d='M5 18.5V20h1.5l9.1-9.1-1.5-1.5L5 18.5z' fill='#ffa726'/>
+                                <path d='M17.7 8.04c.2-.2.2-.51 0-.71l-1-1a.5.5 0 0 0-.71 0l-1.09 1.09 1.5 1.5 1.09-1.09z' fill='#ffa726'/>
+                            </svg>
+                        </button>
+                        <button onclick='deleteContact(${i})' title='Delete' style='background:none; border:none; cursor:pointer; padding:2px;'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                                <path d='M6 7h12' stroke='#e53935' stroke-width='2' stroke-linecap='round'/>
+                                <rect x='9' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
+                                <rect x='13.5' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
+                                <rect x='5' y='7' width='14' height='2' rx='1' fill='#e53935'/>
+                                <rect x='8' y='4' width='8' height='2' rx='1' fill='#e53935'/>
+                                <rect x='7' y='9' width='10' height='10' rx='2' stroke='#e53935' stroke-width='1.5' fill='none'/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>`
             ).join('');
         }
@@ -279,16 +303,63 @@
             document.getElementById('contact-form').style.display = 'none';
             document.getElementById('add-contact-btn').style.display = 'inline-block';
         };
+        // Remove inline edit form logic, add modal for editing
+        if (!document.getElementById('edit-modal')) {
+            const modal = document.createElement('div');
+            modal.id = 'edit-modal';
+            modal.style.display = 'none';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'rgba(0,0,0,0.25)';
+            modal.style.zIndex = '3000';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:12px; padding:32px 28px; min-width:280px; max-width:90vw; box-shadow:0 4px 32px rgba(0,0,0,0.18); display:flex; flex-direction:column; align-items:center;">
+                    <h3 style='margin-bottom:18px; color:#2d3a4a;'>Edit Contact</h3>
+                    <form id='edit-contact-form' style='width:100%; display:flex; flex-direction:column; gap:10px;'>
+                        <input type='text' id='edit-pic' placeholder='PIC Name' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-company' placeholder='Company' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-brand' placeholder='Brand' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-number' placeholder='Contact Number' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
+                            <button type='submit' style='background:#1976d2; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Save</button>
+                            <button type='button' id='cancel-edit-modal' style='background:#aaa; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
         window.editContact = function(index) {
             const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
             const c = contacts[index];
-            document.getElementById('contact-pic').value = c.pic;
-            document.getElementById('contact-company').value = c.company;
-            document.getElementById('contact-brand').value = c.brand;
-            document.getElementById('contact-number').value = c.number;
-            document.getElementById('contact-edit-index').value = index;
-            document.getElementById('contact-form').style.display = 'block';
-            document.getElementById('add-contact-btn').style.display = 'none';
+            const modal = document.getElementById('edit-modal');
+            modal.style.display = 'flex';
+            document.getElementById('edit-pic').value = c.pic;
+            document.getElementById('edit-company').value = c.company;
+            document.getElementById('edit-brand').value = c.brand;
+            document.getElementById('edit-number').value = c.number;
+            document.getElementById('edit-contact-form').onsubmit = function(e) {
+                e.preventDefault();
+                const pic = document.getElementById('edit-pic').value.trim();
+                const company = document.getElementById('edit-company').value.trim();
+                const brand = document.getElementById('edit-brand').value.trim();
+                const number = document.getElementById('edit-number').value.trim();
+                if (!pic || !company || !brand || !number) return;
+                contacts[index] = { pic, company, brand, number };
+                localStorage.setItem('loanContacts', JSON.stringify(contacts));
+                renderContacts();
+                modal.style.display = 'none';
+            };
+            document.getElementById('cancel-edit-modal').onclick = function() {
+                document.getElementById('edit-contact-form').reset();
+                modal.style.display = 'none';
+            };
         };
         window.deleteContact = function(index) {
             let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
@@ -300,7 +371,18 @@
                 renderContacts();
             }
         };
-        window.addEventListener('DOMContentLoaded', renderContacts);
+        window.copyContactNumber = function(index) {
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const number = contacts[index].number;
+            navigator.clipboard.writeText(number).then(() => {
+                // Optionally, show a copied message
+            });
+        };
+        window.addEventListener('DOMContentLoaded', function() {
+            renderContacts();
+            var modal = document.getElementById('edit-modal');
+            if (modal) modal.style.display = 'none';
+        });
     </script>
 </body>
 </html>
