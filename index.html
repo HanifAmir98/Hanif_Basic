@@ -1,388 +1,641 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Time Calculator</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f6f8fa; margin: 0; padding: 0; }
-        .container {
-            background: #fff;
-            max-width: 400px;
-            margin: 60px auto;
-            padding: 32px 28px 28px 28px;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-        }
-        h2 { text-align: center; color: #2d3a4a; margin-bottom: 24px; }
-        label { display: block; margin-top: 18px; color: #444; font-weight: 500; }
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 6px;
-        }
-        input[type="number"], select {
-            padding: 6px 10px;
-            border: 1px solid #cfd8dc;
-            border-radius: 6px;
-            font-size: 1rem;
-            width: 70px;
-        }
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        button {
-            margin-top: 28px;
-            width: 100%;
-            padding: 10px 0;
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover { background: #125ea7; }
-        .result {
-            margin-top: 32px;
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 18px 14px;
-            color: #1a237e;
-            font-size: 1.15rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
-        }
-        .result-label {
-            font-weight: bold;
-            color: #0d47a1;
-        }
-        @media (max-width: 500px) {
-            .container { padding: 16px 6px; }
-            input[type="number"], select { width: 55px; }
-        }
-        .contact-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 100vh;
-            background: #fff;
-            box-shadow: -2px 0 16px rgba(0,0,0,0.08);
-            padding: 32px 18px 18px 18px;
-            z-index: 2000;
-            overflow-y: auto;
-            border-radius: 16px 0 0 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        @media (max-width: 700px) {
-            .contact-sidebar {
-                width: 100vw;
-                height: auto;
-                min-height: 220px;
-                max-height: 60vh;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                top: auto;
-                border-radius: 16px 16px 0 0;
-                box-shadow: 0 -2px 16px rgba(0,0,0,0.12);
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual Guide Creator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+    h1 { text-align: center; }
+    .manual-form, .manual-list { max-width: 600px; margin: 20px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+    .manual-form input[type="text"], .manual-form textarea { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
+    .manual-form input[type="file"] { margin-bottom: 12px; }
+    .manual-form button { padding: 8px 16px; border: none; background: #007bff; color: #fff; border-radius: 4px; cursor: pointer; }
+    .manual-form button:disabled { background: #aaa; }
+    .manual-list .instruction { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; background: #f5f5f5; padding: 16px; border-radius: 6px; }
+    .manual-list img { max-width: 120px; max-height: 120px; border-radius: 4px; border: 1px solid #ddd; }
+    .manual-list .actions { margin-left: auto; display: flex; flex-direction: column; gap: 8px; }
+    .manual-list .actions button { background: #28a745; }
+    .manual-list .actions .delete { background: #dc3545; }
+    .manual-list .actions .edit { background: #ffc107; color: #333; }
+    .manual-list .actions button { color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    .manual-list .actions .edit { color: #333; }
+    .manual-list .actions .delete { color: #fff; }
+    .manual-list .title { font-weight: bold; font-size: 1.1em; margin-bottom: 4px; }
+    .manual-list .instruction-text { margin-bottom: 8px; }
+    .manual-view img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-top: 8px;
+      cursor: zoom-in;
+      transition: box-shadow 0.2s;
+    }
+    .manual-view-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .manual-view-modal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 4px 32px #0008;
+      cursor: zoom-out;
+    }
+    .manual-view-step {
+      background: #f7faff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px #0001;
+      padding: 18px 20px 18px 20px;
+      margin-bottom: 28px;
+      border-left: 6px solid #007bff;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .manual-view-step-number {
+      position: absolute;
+      left: -32px;
+      top: 18px;
+      background: #007bff;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.1em;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #007bff22;
+    }
+    .manual-view .title {
+      font-size: 1.15em;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #222;
+    }
+    .manual-view .instruction-text {
+      margin-bottom: 10px;
+      color: #444;
+      font-size: 1em;
+    }
+    .manual-view h2 {
+      font-size: 1.4em;
+      color: #007bff;
+      letter-spacing: 1px;
+    }
+    .manual-view #manualViewList {
+      margin-top: 24px;
+    }
+    .manual-view #manualViewBackBtn {
+      margin-top: 24px;
+      background: #007bff;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 1em;
+      padding: 8px 20px;
+      border: none;
+      cursor: pointer;
+    }
+    .manual-view #manualViewBackBtn:hover {
+      background: #0056b3;
+    }
+    .manual-view #manualViewGear {
+      color: #007bff;
+    }
+    .manual-form input, .manual-form textarea {
+      font-size: 1em;
+    }
+    .manual-form {
+      background: #f7faff;
+    }
+    .manual-form-buttons button {
+      font-size: 1em;
+    }
+    .manual-form input[type="text"]#manualNameInput {
+      background: #eaf4ff;
+      border: 1.5px solid #b6d4fe;
+    }
+    .manual-form input[type="text"]#manualNameInput:focus {
+      border: 1.5px solid #007bff;
+      outline: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Work Time & OT Calculator</h2>
-        <form id="workForm" onsubmit="return false;">
-            <label>
-                Work Hours:
-                <input type="number" id="workHours" value="9.5" step="0.1" min="0" required>
-            </label>
-            <label>
-                Start Time:
-                <div class="input-row">
-                    <input type="number" id="startHour" min="1" max="12" value="7" required> :
-                    <input type="number" id="startMinute" min="0" max="59" value="00" required>
-                    <select id="ampm">
-                        <option value="AM" selected>AM</option>
-                        <option value="PM">PM</option>
-                    </select>
-                </div>
-            </label>
-            <label>
-                OT Hours:
-                <input type="number" id="otHours" value="1" step="0.1" min="0" required>
-            </label>
-            <button type="button" onclick="calculateTimes()">Calculate</button>
-        </form>
-        <div class="result" id="result" style="display:none;"></div>
+  <h1>Manual Guide Creator</h1>
+  <div id="mainPage" style="max-width:600px;margin:20px auto;background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 8px #0001;">
+    <label for="manualSelect"><b>Select Manual:</b></label>
+    <select id="manualSelect" style="width:70%;margin:0 8px 16px 8px;"></select>
+    <button id="openManualBtn">Open</button>
+    <button id="newManualBtn">New Manual</button>
+  </div>
+  <div class="manual-form" id="manualForm" style="display:none;">
+    <input type="text" id="manualNameInput" placeholder="Manual Name" required style="font-weight:bold;font-size:1.1em;margin-bottom:16px;" />
+    <input type="text" id="titleInput" placeholder="Instruction Title" required />
+    <textarea id="instructionInput" rows="3" placeholder="Instruction" required></textarea>
+    <input type="file" id="imageInput" accept="image/*" />
+    <div class="manual-form-buttons" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;">
+      <div style="display:flex;gap:8px;">
+        <button id="addBtn">Add Instruction</button>
+        <button id="updateBtn" style="display:none;">Update Instruction</button>
+        <button id="cancelEditBtn" style="display:none; background:#aaa;">Cancel Edit</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button id="saveLockBtn" style="background:#333;">Save & Lock</button>
+        <button id="deleteManualBtn" style="background:#dc3545;color:#fff;">Delete Manual</button>
+        <button id="backBtn" style="background:#aaa;">Back to Main</button>
+      </div>
     </div>
-    <button id="phone-float-btn"
-        style="position:fixed; right:24px; bottom:160px; background:#43a047; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
-        title="Show Contacts">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="16" r="16" fill="#43a047"/>
-            <path d="M22.5 20.5c-1.5 0-3-.25-4.5-.75-1.5-.5-2.75-1.25-3.75-2.25s-1.75-2.25-2.25-3.75c-.5-1.5-.75-3-.75-4.5 0-.5.2-.9.6-1.2l2.2-2.2c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-1.1 1.1c.2.6.5 1.2.9 1.7.4.5.9.9 1.4 1.2l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0l-1.1-1.1c-.3.3-.7.3-1 0-.3-.3-.3-.7 0-1l1.1-1.1c-.3-.3-.7-.3-1 0l-2.2 2.2c-.3.3-.3.7 0 1l2.2 2.2c.3.3.7.3 1 0l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0z" fill="#fff"/>
-        </svg>
-    </button>
-    <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
-    <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
-        <div style="display:flex; width:100%; align-items:center; position:relative;">
-            <h3 style="color: #2d3a4a; margin: 2px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Supplier Contact</h3>
-        </div>
-        <div id="contact-list" style="display:none;"></div>
-        <button id="add-contact-btn" style="margin-top: 10px; font-size: 1.2em; background: #388e3c; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display:inline-block;">+</button>
-        <form id="contact-form" style="display:none; margin-top: 12px;">
-            <input type="text" id="contact-pic" placeholder="PIC Name" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-company" placeholder="Company" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-brand" placeholder="Brand" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-number" placeholder="Contact Number" required style="margin-bottom:4px; width: 120px;">
-            <input type="hidden" id="contact-edit-index">
-            <button type="submit" style="background: #1976d2; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Save</button>
-            <button type="button" id="cancel-edit-btn" style="background: #aaa; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Cancel</button>
-        </form>
+  </div>
+  <div class="manual-view" id="manualView" style="display:none;max-width:700px;margin:32px auto 0 auto;background:#fff;padding:36px 32px 32px 32px;border-radius:14px;box-shadow:0 4px 24px #0002;position:relative;">
+    <div id="manualViewHeader" style="margin-bottom:28px;">
+      <div style="background:#f3f7ff;border-radius:10px;padding:18px 28px 16px 28px;box-shadow:0 2px 8px #007bff11;margin-bottom:0;display:flex;align-items:center;">
+        <h2 id="manualViewName" style="margin:0;font-size:2em;font-weight:700;letter-spacing:1px;color:#1a237e;">Manual Name</h2>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:16px;margin-top:10px;">
+        <button id="manualViewEditBtn" style="background:#ffc107;color:#333;padding:10px 28px;border-radius:6px;border:none;cursor:pointer;font-size:1.08em;box-shadow:0 2px 8px #0001;transition:background 0.2s;font-weight:600;">Edit</button>
+        <button id="exportPdfBtn" style="background:#28a745;color:#fff;padding:10px 28px;border-radius:6px;border:none;cursor:pointer;font-size:1.08em;box-shadow:0 2px 8px #0001;transition:background 0.2s;font-weight:600;">Export as PDF</button>
+      </div>
     </div>
-    <div class="container" style="margin-top: 24px; text-align: center;">
-        <h3 style="margin-bottom: 18px; color: #2d3a4a;">Quick Access Links</h3>
-        <button onclick="window.open('https://www.renecosystem.com/ESS/MY/sasb/', '_blank')" style="background:#388e3c; margin-bottom: 14px;">Open Company ESS Portal</button><br>
-        <span style="font-size:0.95em; color:#555;">(Clock-in, Payslip, OT, Leave, etc.)</span>
-        <hr style="margin: 22px 0 18px 0; border: none; border-top: 1px solid #e0e0e0;">
-        <button onclick="window.open('https://stratusautomation.sharepoint.com/sites/CRBChangeReviewBoard/', '_blank')" style="background:#1976d2;">Open CRB Submission Portal</button><br>
-        <span style="font-size:0.95em; color:#555;">(Submit Change Review Board requests)</span>
-    </div>
-    <button onclick="window.open('https://www.youtube.com', '_blank')" 
-        style="position:fixed; right:24px; bottom:92px; background:#ff0000; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
-        title="Open YouTube">
-        <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-            <circle cx="16" cy="16" r="16" fill="#ff0000"/>
-            <polygon points="13,11 24,16 13,21" fill="#fff"/>
-        </svg>
-    </button>
-    <button onclick="window.open('https://www.google.com', '_blank')" 
-        style="position:fixed; right:24px; bottom:24px; background:#8ecaff; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
-        title="Open Google">
-        <svg width="40" height="40" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-            <g>
-                <circle cx="16" cy="16" r="16" fill="#8ecaff"/>
-                <path d="M23.6 16.2c0-.5-.1-.9-.2-1.3H16v2.6h4.3c-.2 1.1-1.3 3.1-4.3 3.1-2.6 0-4.7-2.2-4.7-4.8s2.1-4.8 4.7-4.8c1.5 0 2.5.6 3.1 1.2l2.1-2c-1.4-1.3-3.1-2.1-5.2-2.1-4 0-7.2 3.2-7.2 7.2s3.2 7.2 7.2 7.2c4.1 0 6.8-2.9 6.8-7 0-.5-.1-.9-.2-1.3z" fill="#fff"/>
-                <path d="M16 24c2.2 0 4.1-.7 5.5-2l-2.6-2c-.7.5-1.7.8-2.9.8-2.2 0-4-1.5-4.7-3.5H8.6v2.2C10 22.2 12.8 24 16 24z" fill="#34a853"/>
-                <path d="M11.3 17.3c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6v-2.2H8.6C8.2 13.8 8 14.9 8 16s.2 2.2.6 3.2l2.7-2z" fill="#fbbc05"/>
-                <path d="M16 11.5c1.2 0 2.3.4 3.1 1.2l2.1-2C19.9 9.2 18.1 8.5 16 8.5c-3.2 0-6 1.8-7.4 4.5l2.7 2c.7-2 2.5-3.5 4.7-3.5z" fill="#ea4335"/>
-            </g>
-        </svg>
-    </button>
-    <script>
-        function formatTime(hour24, minute) {
-            let ampm = hour24 >= 12 ? 'PM' : 'AM';
-            let hour12 = hour24 % 12;
-            if (hour12 === 0) hour12 = 12;
-            return `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`;
-        }
+    <hr style="border:none;border-top:1.5px solid #e0e0e0;margin-bottom:28px;">
+    <div id="manualViewList"></div>
+    <button id="manualViewBackBtn" style="margin-top:32px;background:#aaa;padding:10px 28px;border-radius:6px;font-size:1.08em;font-weight:600;">Back to Main</button>
+  </div>
+  <div id="manualViewModal" class="manual-view-modal" style="display:none;"><img id="manualViewModalImg" src="" alt="Manual Zoom" /></div>
+  <div class="manual-list" id="manualList" style="display:none;"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let manual = [];
+    let editIndex = null;
+    let currentManualName = null;
+    let locked = false;
 
-        function calculateTimes() {
-            const workHours = parseFloat(document.getElementById('workHours').value);
-            let hour = parseInt(document.getElementById('startHour').value, 10);
-            let minute = parseInt(document.getElementById('startMinute').value, 10);
-            const ampm = document.getElementById('ampm').value;
-            const otHours = parseFloat(document.getElementById('otHours').value);
+    const titleInput = document.getElementById('titleInput');
+    const instructionInput = document.getElementById('instructionInput');
+    const imageInput = document.getElementById('imageInput');
+    const addBtn = document.getElementById('addBtn');
+    const updateBtn = document.getElementById('updateBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const saveLockBtn = document.getElementById('saveLockBtn');
+    const manualList = document.getElementById('manualList');
+    const manualForm = document.getElementById('manualForm');
+    const mainPage = document.getElementById('mainPage');
+    const manualSelect = document.getElementById('manualSelect');
+    const openManualBtn = document.getElementById('openManualBtn');
+    const newManualBtn = document.getElementById('newManualBtn');
+    const manualNameInput = document.getElementById('manualNameInput');
+    const backBtn = document.getElementById('backBtn');
+    const manualView = document.getElementById('manualView');
+    const manualViewName = document.getElementById('manualViewName');
+    const manualViewList = document.getElementById('manualViewList');
+    const manualViewEditBtn = document.getElementById('manualViewEditBtn');
+    const manualViewBackBtn = document.getElementById('manualViewBackBtn');
+    const manualViewModal = document.getElementById('manualViewModal');
+    const manualViewModalImg = document.getElementById('manualViewModalImg');
+    const deleteManualBtn = document.getElementById('deleteManualBtn');
+    const exportPdfBtn = document.getElementById('exportPdfBtn');
 
-            if (ampm === 'PM' && hour !== 12) hour += 12;
-            if (ampm === 'AM' && hour === 12) hour = 0;
-
-            // Calculate end work time
-            let totalMinutes = hour * 60 + minute + Math.round(workHours * 60);
-            let endHour = Math.floor(totalMinutes / 60) % 24;
-            let endMinute = totalMinutes % 60;
-
-            // Calculate end OT time
-            let otMinutes = totalMinutes + Math.round(otHours * 60);
-            let otHour = Math.floor(otMinutes / 60) % 24;
-            let otMinute = otMinutes % 60;
-
-            // Output
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('result').innerHTML =
-                `<div><span class='result-label'>End Work Time:</span> ${formatTime(endHour, endMinute)}</div>` +
-                `<div style='margin-top:12px;'><span class='result-label'>End OT Time:</span> ${formatTime(otHour, otMinute)}</div>`;
-        }
-
-        // Loan Part Supplier Contact Section
-        function renderContacts() {
-            const list = document.getElementById('contact-list');
-            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
-            if (contacts.length === 0) {
-                list.innerHTML = '<div style="color:#888;">No contacts saved.</div>';
-                return;
-            }
-            list.innerHTML = contacts.map((c, i) =>
-                `<div style='border:1px solid #e0e0e0; border-radius:6px; padding:8px 10px; margin-bottom:7px; background:#f9f9f9; position:relative;'>
-                    <div>
-                        <b>PIC:</b> ${c.pic} <br>
-                        <b>Company:</b> ${c.company} <br>
-                        <b>Brand:</b> ${c.brand} <br>
-                        <b>Contact:</b> <span id='contact-num-${i}' style='user-select:all;'>${c.number}</span>
-                    </div>
-                    <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
-                        <button onclick='copyContactNumber(${i})' title='Copy Number' style='background:none; border:none; cursor:pointer; padding:2px;'>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' style='vertical-align:middle;'>
-                                <rect x='6' y='6' width='12' height='14' rx='2' fill='#888'/>
-                                <rect x='4' y='4' width='12' height='14' rx='2' stroke='#888' stroke-width='1.5' fill='none'/>
-                            </svg>
-                        </button>
-                        <button onclick='editContact(${i})' title='Edit' style='background:none; border:none; cursor:pointer; padding:2px;'>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-                                <path d='M5 18.5V20h1.5l9.1-9.1-1.5-1.5L5 18.5z' fill='#ffa726'/>
-                                <path d='M17.7 8.04c.2-.2.2-.51 0-.71l-1-1a.5.5 0 0 0-.71 0l-1.09 1.09 1.5 1.5 1.09-1.09z' fill='#ffa726'/>
-                            </svg>
-                        </button>
-                        <button onclick='deleteContact(${i})' title='Delete' style='background:none; border:none; cursor:pointer; padding:2px;'>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
-                                <path d='M6 7h12' stroke='#e53935' stroke-width='2' stroke-linecap='round'/>
-                                <rect x='9' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
-                                <rect x='13.5' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
-                                <rect x='5' y='7' width='14' height='2' rx='1' fill='#e53935'/>
-                                <rect x='8' y='4' width='8' height='2' rx='1' fill='#e53935'/>
-                                <rect x='7' y='9' width='10' height='10' rx='2' stroke='#e53935' stroke-width='1.5' fill='none'/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>`
-            ).join('');
-        }
-        const phoneBtn = document.getElementById('phone-float-btn');
-        const sidebar = document.getElementById('contact-sidebar');
-        const overlay = document.getElementById('contact-overlay');
-        phoneBtn.onclick = function() {
-            sidebar.style.display = 'flex';
-            overlay.style.display = 'block';
-            renderContacts();
-            document.getElementById('contact-list').style.display = 'block';
-            document.getElementById('add-contact-btn').style.display = 'inline-block';
-        };
-        overlay.onclick = function(e) {
-            sidebar.style.display = 'none';
-            overlay.style.display = 'none';
-            document.getElementById('contact-form').style.display = 'none';
-        };
-        document.getElementById('add-contact-btn').onclick = function() {
-            document.getElementById('contact-form').style.display = 'block';
-            this.style.display = 'none';
-            document.getElementById('contact-form').reset();
-            document.getElementById('contact-edit-index').value = '';
-        };
-        document.getElementById('contact-form').onsubmit = function(e) {
-            e.preventDefault();
-            const pic = document.getElementById('contact-pic').value.trim();
-            const company = document.getElementById('contact-company').value.trim();
-            const brand = document.getElementById('contact-brand').value.trim();
-            const number = document.getElementById('contact-number').value.trim();
-            const editIndex = document.getElementById('contact-edit-index').value;
-            if (!pic || !company || !brand || !number) return;
-            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
-            if (editIndex !== '') {
-                contacts[editIndex] = { pic, company, brand, number };
-            } else {
-                contacts.push({ pic, company, brand, number });
-            }
-            localStorage.setItem('loanContacts', JSON.stringify(contacts));
-            renderContacts();
-            document.getElementById('contact-form').reset();
-            document.getElementById('contact-form').style.display = 'none';
-            document.getElementById('add-contact-btn').style.display = 'inline-block';
-        };
-        document.getElementById('cancel-edit-btn').onclick = function() {
-            document.getElementById('contact-form').reset();
-            document.getElementById('contact-form').style.display = 'none';
-            document.getElementById('add-contact-btn').style.display = 'inline-block';
-        };
-        // Remove inline edit form logic, add modal for editing
-        if (!document.getElementById('edit-modal')) {
-            const modal = document.createElement('div');
-            modal.id = 'edit-modal';
-            modal.style.display = 'none';
-            modal.style.position = 'fixed';
-            modal.style.top = '0';
-            modal.style.left = '0';
-            modal.style.width = '100vw';
-            modal.style.height = '100vh';
-            modal.style.background = 'rgba(0,0,0,0.25)';
-            modal.style.zIndex = '3000';
-            modal.style.display = 'flex';
-            modal.style.alignItems = 'center';
-            modal.style.justifyContent = 'center';
-            modal.innerHTML = `
-                <div style="background:#fff; border-radius:12px; padding:32px 28px; min-width:280px; max-width:90vw; box-shadow:0 4px 32px rgba(0,0,0,0.18); display:flex; flex-direction:column; align-items:center;">
-                    <h3 style='margin-bottom:18px; color:#2d3a4a;'>Edit Contact</h3>
-                    <form id='edit-contact-form' style='width:100%; display:flex; flex-direction:column; gap:10px;'>
-                        <input type='text' id='edit-pic' placeholder='PIC Name' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
-                        <input type='text' id='edit-company' placeholder='Company' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
-                        <input type='text' id='edit-brand' placeholder='Brand' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
-                        <input type='text' id='edit-number' placeholder='Contact Number' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
-                        <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
-                            <button type='submit' style='background:#1976d2; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Save</button>
-                            <button type='button' id='cancel-edit-modal' style='background:#aaa; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        window.editContact = function(index) {
-            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
-            const c = contacts[index];
-            const modal = document.getElementById('edit-modal');
-            modal.style.display = 'flex';
-            document.getElementById('edit-pic').value = c.pic;
-            document.getElementById('edit-company').value = c.company;
-            document.getElementById('edit-brand').value = c.brand;
-            document.getElementById('edit-number').value = c.number;
-            document.getElementById('edit-contact-form').onsubmit = function(e) {
-                e.preventDefault();
-                const pic = document.getElementById('edit-pic').value.trim();
-                const company = document.getElementById('edit-company').value.trim();
-                const brand = document.getElementById('edit-brand').value.trim();
-                const number = document.getElementById('edit-number').value.trim();
-                if (!pic || !company || !brand || !number) return;
-                contacts[index] = { pic, company, brand, number };
-                localStorage.setItem('loanContacts', JSON.stringify(contacts));
-                renderContacts();
-                modal.style.display = 'none';
-            };
-            document.getElementById('cancel-edit-modal').onclick = function() {
-                document.getElementById('edit-contact-form').reset();
-                modal.style.display = 'none';
-            };
-        };
-        window.deleteContact = function(index) {
-            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
-            const c = contacts[index];
-            const msg = `Delete this contact?\n\nPIC: ${c.pic}\nCompany: ${c.company}\nBrand: ${c.brand}\nContact: ${c.number}`;
-            if (confirm(msg)) {
-                contacts.splice(index, 1);
-                localStorage.setItem('loanContacts', JSON.stringify(contacts));
-                renderContacts();
-            }
-        };
-        window.copyContactNumber = function(index) {
-            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
-            const number = contacts[index].number;
-            navigator.clipboard.writeText(number).then(() => {
-                // Optionally, show a copied message
-            });
-        };
-        window.addEventListener('DOMContentLoaded', function() {
-            renderContacts();
-            var modal = document.getElementById('edit-modal');
-            if (modal) modal.style.display = 'none';
+    function updateManualDropdown() {
+      manualSelect.innerHTML = '';
+      // Get all manuals and parse their names
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('manual_'));
+      const manuals = keys.map(k => {
+        try {
+          const arr = JSON.parse(localStorage.getItem(k));
+          return { key: k, name: arr && arr.manualName ? arr.manualName : k.replace('manual_', '') };
+        } catch { return { key: k, name: k.replace('manual_', '') }; }
+      });
+      if (manuals.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '-- No Manuals Saved --';
+        manualSelect.appendChild(opt);
+      } else {
+        manuals.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.key;
+          opt.textContent = m.name;
+          manualSelect.appendChild(opt);
         });
-    </script>
+      }
+    }
+
+    function renderManual() {
+      manualList.innerHTML = '';
+      manual.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'instruction';
+        const content = document.createElement('div');
+        content.innerHTML = `<div class=\"title\">${item.title}</div><div class=\"instruction-text\">${item.instruction}</div>`;
+        div.appendChild(content);
+        if (item.image) {
+          const img = document.createElement('img');
+          img.src = item.image;
+          div.appendChild(img);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        // Up button
+        const upBtn = document.createElement('button');
+        upBtn.textContent = '↑';
+        upBtn.title = 'Move Up';
+        upBtn.disabled = idx === 0 || locked;
+        upBtn.onclick = () => moveInstruction(idx, -1);
+        actions.appendChild(upBtn);
+        // Down button
+        const downBtn = document.createElement('button');
+        downBtn.textContent = '↓';
+        downBtn.title = 'Move Down';
+        downBtn.disabled = idx === manual.length - 1 || locked;
+        downBtn.onclick = () => moveInstruction(idx, 1);
+        actions.appendChild(downBtn);
+        // Edit button
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'Edit';
+        editBtn.className = 'edit';
+        editBtn.disabled = locked;
+        editBtn.onclick = () => startEdit(idx);
+        actions.appendChild(editBtn);
+        // Delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.className = 'delete';
+        deleteBtn.disabled = locked;
+        deleteBtn.onclick = () => deleteInstruction(idx);
+        actions.appendChild(deleteBtn);
+        div.appendChild(actions);
+        manualList.appendChild(div);
+      });
+    }
+
+    function resetForm() {
+      titleInput.value = '';
+      instructionInput.value = '';
+      imageInput.value = '';
+      addBtn.style.display = '';
+      updateBtn.style.display = 'none';
+      cancelEditBtn.style.display = 'none';
+      editIndex = null;
+      delete imageInput.dataset.pasted;
+      hidePastedImagePreview();
+    }
+
+    function setFormLock(state) {
+      locked = state;
+      manualNameInput.disabled = locked;
+      titleInput.disabled = locked;
+      instructionInput.disabled = locked;
+      imageInput.disabled = locked;
+      addBtn.disabled = locked;
+      updateBtn.disabled = locked;
+      cancelEditBtn.disabled = locked;
+      saveLockBtn.disabled = locked;
+      renderManual();
+    }
+
+    // Add a preview for pasted images
+    let pastedImagePreview = null;
+    function showPastedImagePreview(dataUrl) {
+      if (!pastedImagePreview) {
+        pastedImagePreview = document.createElement('img');
+        pastedImagePreview.style.maxWidth = '120px';
+        pastedImagePreview.style.maxHeight = '120px';
+        pastedImagePreview.style.display = 'block';
+        pastedImagePreview.style.margin = '8px 0';
+        instructionInput.parentNode.insertBefore(pastedImagePreview, imageInput);
+      }
+      pastedImagePreview.src = dataUrl;
+      pastedImagePreview.style.display = 'block';
+    }
+    function hidePastedImagePreview() {
+      if (pastedImagePreview) {
+        pastedImagePreview.style.display = 'none';
+        pastedImagePreview.src = '';
+      }
+    }
+
+    instructionInput.addEventListener('paste', function(event) {
+      if (event.clipboardData && event.clipboardData.items) {
+        for (let i = 0; i < event.clipboardData.items.length; i++) {
+          const item = event.clipboardData.items[i];
+          if (item.type.indexOf('image') !== -1) {
+            const file = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              imageInput.value = '';
+              imageInput.dataset.pasted = e.target.result;
+              showPastedImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            event.preventDefault();
+            break;
+          }
+        }
+      }
+    });
+
+    function getCurrentImage() {
+      if (imageInput.files && imageInput.files[0]) {
+        return new Promise(resolve => {
+          const reader = new FileReader();
+          reader.onload = function(e) { resolve(e.target.result); };
+          reader.readAsDataURL(imageInput.files[0]);
+        });
+      } else if (imageInput.dataset.pasted) {
+        return Promise.resolve(imageInput.dataset.pasted);
+      } else {
+        return Promise.resolve(null);
+      }
+    }
+
+    async function addInstruction() {
+      if (locked) return;
+      const title = titleInput.value.trim();
+      const instruction = instructionInput.value.trim();
+      if (!title || !instruction) return;
+      const image = await getCurrentImage();
+      manual.push({ title, instruction, image });
+      renderManual();
+      resetForm();
+      delete imageInput.dataset.pasted;
+      hidePastedImagePreview();
+    }
+
+    function startEdit(idx) {
+      if (locked) return;
+      editIndex = idx;
+      const item = manual[idx];
+      titleInput.value = item.title;
+      instructionInput.value = item.instruction;
+      addBtn.style.display = 'none';
+      updateBtn.style.display = '';
+      cancelEditBtn.style.display = '';
+    }
+
+    async function updateInstruction() {
+      if (locked || editIndex === null) return;
+      const title = titleInput.value.trim();
+      const instruction = instructionInput.value.trim();
+      if (!title || !instruction) return;
+      const image = await getCurrentImage();
+      if (image !== null) {
+        manual[editIndex] = { title, instruction, image };
+      } else {
+        manual[editIndex] = { ...manual[editIndex], title, instruction };
+      }
+      renderManual();
+      resetForm();
+      delete imageInput.dataset.pasted;
+      hidePastedImagePreview();
+    }
+
+    function deleteInstruction(idx) {
+      if (locked) return;
+      manual.splice(idx, 1);
+      renderManual();
+      resetForm();
+    }
+
+    function moveInstruction(idx, direction) {
+      if (locked) return;
+      const newIndex = idx + direction;
+      if (newIndex < 0 || newIndex >= manual.length) return;
+      const temp = manual[idx];
+      manual[idx] = manual[newIndex];
+      manual[newIndex] = temp;
+      renderManual();
+    }
+
+    function saveAndLockManual() {
+      if (!manual.length) return alert('Manual is empty!');
+      let name = manualNameInput.value.trim();
+      if (!name) {
+        alert('Please enter a manual name.');
+        manualNameInput.focus();
+        return;
+      }
+      // Check for duplicate name (except current)
+      const keys = Object.keys(localStorage).filter(k => k.startsWith('manual_'));
+      for (const k of keys) {
+        if (k !== 'manual_' + currentManualName && localStorage.getItem(k)) {
+          try {
+            const arr = JSON.parse(localStorage.getItem(k));
+            if (arr && arr.manualName === name) {
+              alert('A manual with this name already exists. Please choose another name.');
+              return;
+            }
+          } catch {}
+        }
+      }
+      currentManualName = name;
+      // Save manual with name
+      const manualToSave = manual.map(i => ({...i}));
+      manualToSave.manualName = name;
+      localStorage.setItem('manual_' + name, JSON.stringify(manualToSave));
+      setFormLock(true);
+      updateManualDropdown();
+      alert('Manual saved and locked!');
+    }
+
+    function openManual(name) {
+      const data = localStorage.getItem('manual_' + name);
+      if (!data) return alert('Manual not found!');
+      let arr = JSON.parse(data);
+      if (Array.isArray(arr)) {
+        manual = arr;
+        manualNameInput.value = arr.manualName || name;
+        currentManualName = arr.manualName || name;
+      } else {
+        manual = [];
+        manualNameInput.value = name;
+        currentManualName = name;
+      }
+      setFormLock(false);
+      mainPage.style.display = 'none';
+      manualForm.style.display = '';
+      manualList.style.display = '';
+      renderManual();
+      resetForm();
+    }
+
+    function newManual() {
+      manual = [];
+      currentManualName = null;
+      manualNameInput.value = '';
+      setFormLock(false);
+      mainPage.style.display = 'none';
+      manualForm.style.display = '';
+      manualList.style.display = '';
+      renderManual();
+      resetForm();
+    }
+
+    function showMainPage() {
+      mainPage.style.display = '';
+      manualForm.style.display = 'none';
+      manualList.style.display = 'none';
+      manualView.style.display = 'none'; // Ensure view page is hidden
+      currentManualName = null;
+      manual = [];
+      setFormLock(false);
+      updateManualDropdown();
+    }
+
+    function showManualView(name) {
+      const data = localStorage.getItem('manual_' + name);
+      if (!data) return alert('Manual not found!');
+      let arr = JSON.parse(data);
+      let manualArr, manualName;
+      if (Array.isArray(arr)) {
+        manualArr = arr;
+        manualName = arr.manualName || name;
+      } else {
+        manualArr = [];
+        manualName = name;
+      }
+      manualViewName.textContent = manualName;
+      manualViewList.innerHTML = '';
+      if (manualArr.length === 0) {
+        manualViewList.innerHTML = '<div style="color:#888;">No instructions in this manual.</div>';
+      } else {
+        manualArr.forEach((item, idx) => {
+          const div = document.createElement('div');
+          div.className = 'manual-view-step';
+          // Step number
+          const stepNum = document.createElement('div');
+          stepNum.className = 'manual-view-step-number';
+          stepNum.textContent = idx + 1;
+          div.appendChild(stepNum);
+          // Content
+          const content = document.createElement('div');
+          content.innerHTML = `<div class=\"title\">${item.title}</div><div class=\"instruction-text\">${item.instruction}</div>`;
+          content.style.marginLeft = '16px';
+          div.appendChild(content);
+          if (item.image) {
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = 'Instruction Image';
+            img.onclick = function() {
+              manualViewModalImg.src = item.image;
+              manualViewModal.style.display = '';
+            };
+            img.style.marginLeft = '16px';
+            div.appendChild(img);
+          }
+          manualViewList.appendChild(div);
+        });
+      }
+      mainPage.style.display = 'none';
+      manualForm.style.display = 'none';
+      manualList.style.display = 'none';
+      manualView.style.display = '';
+    }
+    manualViewModal.onclick = function() {
+      manualViewModal.style.display = 'none';
+      manualViewModalImg.src = '';
+    };
+
+    openManualBtn.onclick = function() {
+      const val = manualSelect.value;
+      if (!val) return;
+      const name = val.replace('manual_', '');
+      currentManualName = name;
+      showManualView(name);
+    };
+    newManualBtn.onclick = newManual;
+    saveLockBtn.onclick = saveAndLockManual;
+    addBtn.onclick = addInstruction;
+    updateBtn.onclick = updateInstruction;
+    cancelEditBtn.onclick = resetForm;
+    backBtn.onclick = showMainPage;
+    manualViewEditBtn.onclick = function() {
+      // Go to edit mode for the current manual
+      openManual(currentManualName);
+      manualView.style.display = 'none';
+    };
+    manualViewBackBtn.onclick = showMainPage;
+    deleteManualBtn.onclick = function() {
+      if (!currentManualName) return;
+      if (confirm('Are you sure you want to delete this manual? This action cannot be undone.')) {
+        localStorage.removeItem('manual_' + currentManualName);
+        showMainPage();
+        updateManualDropdown();
+      }
+    };
+    document.getElementById('manualView').addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'exportPdfBtn') {
+        if (!currentManualName) {
+          alert('No manual is currently open.');
+          return;
+        }
+        const data = localStorage.getItem('manual_' + currentManualName);
+        if (!data) {
+          alert('Manual not found!');
+          return;
+        }
+        let arr = JSON.parse(data);
+        let manualArr, manualName;
+        if (Array.isArray(arr)) {
+          manualArr = arr;
+          manualName = arr.manualName || currentManualName;
+        } else {
+          manualArr = [];
+          manualName = currentManualName;
+        }
+        const doc = new window.jspdf.jsPDF({format: 'a4', unit: 'mm'});
+        const pageWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const marginLeft = 14;
+        const maxImgWidth = 100; // reduced max width
+        const maxImgHeight = 80; // reduced max height
+        let y = 20;
+        doc.setFontSize(18);
+        doc.text(manualName, marginLeft, y);
+        y += 10;
+        doc.setFontSize(12);
+        manualArr.forEach((item, idx) => {
+          doc.text(`${idx + 1}. ${item.title}`, marginLeft, y);
+          y += 7;
+          doc.text(item.instruction, marginLeft + 4, y);
+          y += 10;
+          if (item.image) {
+            let imgProps = doc.getImageProperties(item.image);
+            let imgWidth = imgProps.width;
+            let imgHeight = imgProps.height;
+            // Scale to fit A4 width and max height, keep aspect ratio
+            let scale = Math.min(maxImgWidth / imgWidth, maxImgHeight / imgHeight, 1);
+            let pdfWidth = imgWidth * scale;
+            let pdfHeight = imgHeight * scale;
+            // Center image horizontally
+            let x = (pageWidth - pdfWidth) / 2;
+            if (y + pdfHeight > pageHeight - 20) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.addImage(item.image, 'JPEG', x, y, pdfWidth, pdfHeight);
+            y += pdfHeight + 5;
+          }
+          if (y > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+          }
+        });
+        doc.save(`${manualName}.pdf`);
+      }
+    });
+
+    // Allow unlocking for editing by returning to main page
+    window.showMainPage = showMainPage;
+
+    // Initial load
+    showMainPage();
+  </script>
 </body>
 </html>
