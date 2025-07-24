@@ -66,6 +66,36 @@
             .container { padding: 16px 6px; }
             input[type="number"], select { width: 55px; }
         }
+        .contact-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 320px;
+            height: 100vh;
+            background: #fff;
+            box-shadow: -2px 0 16px rgba(0,0,0,0.08);
+            padding: 32px 18px 18px 18px;
+            z-index: 2000;
+            overflow-y: auto;
+            border-radius: 16px 0 0 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        @media (max-width: 700px) {
+            .contact-sidebar {
+                width: 100vw;
+                height: auto;
+                min-height: 220px;
+                max-height: 60vh;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                top: auto;
+                border-radius: 16px 16px 0 0;
+                box-shadow: 0 -2px 16px rgba(0,0,0,0.12);
+            }
+        }
     </style>
 </head>
 <body>
@@ -94,6 +124,31 @@
             <button type="button" onclick="calculateTimes()">Calculate</button>
         </form>
         <div class="result" id="result" style="display:none;"></div>
+    </div>
+    <button id="phone-float-btn"
+        style="position:fixed; right:24px; bottom:160px; background:#43a047; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
+        title="Show Contacts">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#43a047"/>
+            <path d="M22.5 20.5c-1.5 0-3-.25-4.5-.75-1.5-.5-2.75-1.25-3.75-2.25s-1.75-2.25-2.25-3.75c-.5-1.5-.75-3-.75-4.5 0-.5.2-.9.6-1.2l2.2-2.2c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-1.1 1.1c.2.6.5 1.2.9 1.7.4.5.9.9 1.4 1.2l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0l-1.1-1.1c-.3.3-.7.3-1 0-.3-.3-.3-.7 0-1l1.1-1.1c-.3-.3-.7-.3-1 0l-2.2 2.2c-.3.3-.3.7 0 1l2.2 2.2c.3.3.7.3 1 0l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0z" fill="#fff"/>
+        </svg>
+    </button>
+    <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
+    <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
+        <div style="display:flex; width:100%; align-items:center; position:relative;">
+            <h3 style="color: #2d3a4a; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Loan Part Supplier Contact</h3>
+        </div>
+        <div id="contact-list" style="display:none;"></div>
+        <button id="add-contact-btn" style="margin-top: 10px; font-size: 1.2em; background: #388e3c; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display:none;">+</button>
+        <form id="contact-form" style="display:none; margin-top: 12px;">
+            <input type="text" id="contact-pic" placeholder="PIC Name" required style="margin-bottom:4px; width: 120px;">
+            <input type="text" id="contact-company" placeholder="Company" required style="margin-bottom:4px; width: 120px;">
+            <input type="text" id="contact-brand" placeholder="Brand" required style="margin-bottom:4px; width: 120px;">
+            <input type="text" id="contact-number" placeholder="Contact Number" required style="margin-bottom:4px; width: 120px;">
+            <input type="hidden" id="contact-edit-index">
+            <button type="submit" style="background: #1976d2; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Save</button>
+            <button type="button" id="cancel-edit-btn" style="background: #aaa; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Cancel</button>
+        </form>
     </div>
     <div class="container" style="margin-top: 24px; text-align: center;">
         <h3 style="margin-bottom: 18px; color: #2d3a4a;">Quick Access Links</h3>
@@ -158,6 +213,94 @@
                 `<div><span class='result-label'>End Work Time:</span> ${formatTime(endHour, endMinute)}</div>` +
                 `<div style='margin-top:12px;'><span class='result-label'>End OT Time:</span> ${formatTime(otHour, otMinute)}</div>`;
         }
+
+        // Loan Part Supplier Contact Section
+        function renderContacts() {
+            const list = document.getElementById('contact-list');
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            if (contacts.length === 0) {
+                list.innerHTML = '<div style="color:#888;">No contacts saved.</div>';
+                return;
+            }
+            list.innerHTML = contacts.map((c, i) =>
+                `<div style='border:1px solid #e0e0e0; border-radius:6px; padding:8px 10px; margin-bottom:7px; background:#f9f9f9; position:relative;'>
+                    <b>PIC:</b> ${c.pic} <br>
+                    <b>Company:</b> ${c.company} <br>
+                    <b>Brand:</b> ${c.brand} <br>
+                    <b>Contact:</b> <a href='tel:${c.number}'>${c.number}</a><br>
+                    <button onclick='editContact(${i})' style='background:#ffa726; color:#fff; border:none; border-radius:4px; padding:2px 8px; margin-right:6px; margin-top:6px;'>Edit</button>
+                    <button onclick='deleteContact(${i})' style='background:#e53935; color:#fff; border:none; border-radius:4px; padding:2px 8px; margin-top:6px;'>Delete</button>
+                </div>`
+            ).join('');
+        }
+        const phoneBtn = document.getElementById('phone-float-btn');
+        const sidebar = document.getElementById('contact-sidebar');
+        const overlay = document.getElementById('contact-overlay');
+        phoneBtn.onclick = function() {
+            sidebar.style.display = 'flex';
+            overlay.style.display = 'block';
+            renderContacts();
+            document.getElementById('contact-list').style.display = 'block';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        overlay.onclick = function(e) {
+            sidebar.style.display = 'none';
+            overlay.style.display = 'none';
+            document.getElementById('contact-form').style.display = 'none';
+        };
+        document.getElementById('add-contact-btn').onclick = function() {
+            document.getElementById('contact-form').style.display = 'block';
+            this.style.display = 'none';
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-edit-index').value = '';
+        };
+        document.getElementById('contact-form').onsubmit = function(e) {
+            e.preventDefault();
+            const pic = document.getElementById('contact-pic').value.trim();
+            const company = document.getElementById('contact-company').value.trim();
+            const brand = document.getElementById('contact-brand').value.trim();
+            const number = document.getElementById('contact-number').value.trim();
+            const editIndex = document.getElementById('contact-edit-index').value;
+            if (!pic || !company || !brand || !number) return;
+            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            if (editIndex !== '') {
+                contacts[editIndex] = { pic, company, brand, number };
+            } else {
+                contacts.push({ pic, company, brand, number });
+            }
+            localStorage.setItem('loanContacts', JSON.stringify(contacts));
+            renderContacts();
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-form').style.display = 'none';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        document.getElementById('cancel-edit-btn').onclick = function() {
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-form').style.display = 'none';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        window.editContact = function(index) {
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const c = contacts[index];
+            document.getElementById('contact-pic').value = c.pic;
+            document.getElementById('contact-company').value = c.company;
+            document.getElementById('contact-brand').value = c.brand;
+            document.getElementById('contact-number').value = c.number;
+            document.getElementById('contact-edit-index').value = index;
+            document.getElementById('contact-form').style.display = 'block';
+            document.getElementById('add-contact-btn').style.display = 'none';
+        };
+        window.deleteContact = function(index) {
+            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const c = contacts[index];
+            const msg = `Delete this contact?\n\nPIC: ${c.pic}\nCompany: ${c.company}\nBrand: ${c.brand}\nContact: ${c.number}`;
+            if (confirm(msg)) {
+                contacts.splice(index, 1);
+                localStorage.setItem('loanContacts', JSON.stringify(contacts));
+                renderContacts();
+            }
+        };
+        window.addEventListener('DOMContentLoaded', renderContacts);
     </script>
 </body>
 </html>
