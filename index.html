@@ -5,35 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Time Calculator</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f9fb; margin: 0; padding: 0; }
-        .container {
-            background: #fff;
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 20px 16px 16px 16px;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.04);
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            color: #263238;
         }
-        h2 { text-align: center; color: #2d3a4a; margin-bottom: 24px; }
-        label { display: block; margin-top: 16px; color: #444; font-weight: 500; }
+        .header {
+            width: 100%;
+            background: #1a237e;
+            color: #fff;
+            padding: 18px 0 8px 0;
+            text-align: center;
+            font-size: 1.7rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(26,35,126,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .header-logo {
+            height: 40px;
+            width: 40px;
+            margin-right: 14px;
+            border-radius: 8px;
+            background: #fff;
+            padding: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .header-credit {
+            position: absolute;
+            right: 18px;
+            bottom: 6px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #c5cae9;
+            letter-spacing: 0.5px;
+        }
+        .main {
+            max-width: 480px;
+            margin: 40px auto 0 auto;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(26,35,126,0.06);
+            padding: 26px 20px 22px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            border: 1px solid #e3e6ee;
+        }
+        .card-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+            color: #1a237e;
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        label {
+            display: block;
+            margin-top: 12px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 1rem;
+        }
         .input-row {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-top: 4px;
+            flex-wrap: wrap;
         }
-        input[type="number"], select {
-            padding: 6px 10px;
-            border: 1px solid #e0e5ea;
-            border-radius: 5px;
+        input[type="number"], select, input[type="text"] {
+            padding: 7px 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
             font-size: 1rem;
-            width: 70px;
-            background: #f9fbfc;
-            transition: border 0.2s;
+            width: 80px;
+            min-width: 0;
         }
-        input[type="number"]:focus, select:focus {
-            border: 1.5px solid #90caf9;
-            outline: none;
+        #startHour, #startMinute {
+            width: 10px;
+            text-align: center;
         }
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
@@ -41,243 +102,235 @@
             margin: 0;
         }
         button {
-            margin-top: 22px;
+            margin-top: 18px;
             width: 100%;
             padding: 10px 0;
-            background: #1976d2;
+            background: #3949ab;
             color: #fff;
             border: none;
-            border-radius: 5px;
-            font-size: 1.05rem;
+            border-radius: 6px;
+            font-size: 1.08rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 4px rgba(25,118,210,0.04);
+            transition: background 0.18s;
         }
-        button:hover, button:focus {
-            background: #125ea7;
+        button:hover {
+            background: #283593;
         }
         .result {
-            margin-top: 24px;
-            background: #f4f8fd;
-            border-radius: 7px;
+            margin-top: 18px;
+            background: #e8eaf6;
+            border-radius: 8px;
             padding: 14px 10px;
             color: #1a237e;
             font-size: 1.08rem;
             text-align: center;
-            box-shadow: 0 1px 4px rgba(25, 118, 210, 0.03);
-            border: none;
+            box-shadow: 0 1px 4px rgba(26,35,126,0.04);
+            border: 1px solid #c5cae9;
         }
         .result-label {
             font-weight: bold;
-            color: #0d47a1;
+            color: #283593;
         }
-        /* Responsive improvements */
-        @media (max-width: 900px) {
-            .container { max-width: 98vw; }
-        }
-        @media (max-width: 700px) {
-            .container { padding: 12px 4px; max-width: 98vw; }
-            input[type="number"], select { width: 55px; }
-            .contact-sidebar {
-                width: 100vw;
-                height: auto;
-                min-height: 220px;
-                max-height: 60vh;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                top: auto;
-                border-radius: 14px 14px 0 0;
-                box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-            }
-        }
-        @media (max-width: 600px) {
-            .main-flex {
-                flex-direction: column !important;
-                gap: 0 !important;
-            }
-            .calculator-box {
-                min-width: 0 !important;
-                max-width: 100vw !important;
-                margin: 0 0 14px 0 !important;
-                box-sizing: border-box;
-            }
-            .container {
-                margin: 12px 2vw !important;
-                padding: 8px 2vw 8px 2vw !important;
-            }
-            header {
-                font-size: 1.1rem !important;
-                padding: 12px 0 6px 0 !important;
-            }
-            .result {
-                font-size: 0.98rem;
-                padding: 10px 4px;
-            }
-        }
-        @media (max-width: 500px) {
-            .container { padding: 6px 2vw !important; }
-            input[type="number"], select { width: 40vw; min-width: 36px; max-width: 80px; }
-            .result { font-size: 0.95rem; }
-        }
-        /* Floating button improvements */
-        .float-btn {
-            position:fixed;
-            right:4vw;
-            width:48px;
-            height:48px;
-            font-size:1.5rem;
-            border-radius:50%;
-            box-shadow:0 2px 8px rgba(0,0,0,0.15);
-            cursor:pointer;
-            z-index:1000;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:0;
-        }
-        #phone-float-btn { bottom: 140px; background:#43a047; }
-        #youtube-float-btn { bottom: 76px; background:#ff0000; }
-        #google-float-btn { bottom: 16px; background:#8ecaff; }
-        @media (max-width: 600px) {
-            .float-btn {
-                width:40px;
-                height:40px;
-                font-size:1.1rem;
-                right:2vw;
-            }
-            #phone-float-btn { bottom: 110px; }
-            #youtube-float-btn { bottom: 58px; }
-            #google-float-btn { bottom: 8px; }
-        }
-        .dropdown-menu-container button {
-            background: transparent;
-            border: none;
-            color: #1976d2;
-            font-size: 2rem;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 5px;
-            transition: background 0.18s;
-        }
-        .dropdown-menu-container button:focus {
-            background: #e3f2fd;
-        }
-        #dropdownMenu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 40px;
-            background: #fff;
-            color: #222;
-            min-width: 150px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.08);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        #dropdownMenu button {
+        .footer {
             width: 100%;
-            background: none;
-            border: none;
-            padding: 10px 16px;
-            text-align: left;
-            font-size: 1rem;
-            color: #1976d2;
-            cursor: pointer;
-            transition: background 0.15s;
-            border-radius: 0;
-            box-shadow: none;
-        }
-        #dropdownMenu button:hover, #dropdownMenu button:focus {
-            background: #e3f2fd;
-            color: #125ea7;
-        }
-        .main-flex {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: stretch;
-            gap: 14px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-            width: 100%;
-            max-width: 100vw;
-            box-sizing: border-box;
-        }
-        .calculator-box > div:first-child {
-            background: #f4f8fd;
-            color: #1976d2;
-            font-size: 1.15rem;
-            font-weight: 600;
-            border-radius: 8px 8px 0 0;
-            padding: 12px 0 8px 0;
+            background: #1a237e;
+            color: #c5cae9;
             text-align: center;
-            margin-bottom: 0;
-            box-shadow: none;
+            padding: 14px 0 10px 0;
+            font-size: 0.98rem;
+            margin-top: 48px;
+            border-radius: 18px 18px 0 0;
+        }
+        .quick-links {
+            background: #f5f7fa;
+            border-radius: 12px;
+            padding: 18px 14px 14px 14px;
+            margin-top: 18px;
+            box-shadow: 0 1px 4px rgba(26,35,126,0.03);
+            border: 1px solid #e3e6ee;
+        }
+        .quick-links-title {
+            color: #3949ab;
+            font-size: 1.08rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .quick-links button {
+            background: #3949ab;
+            color: #fff;
+            margin-bottom: 10px;
+            width: auto;
+            padding: 8px 18px;
+            font-size: 1rem;
+            border-radius: 6px;
+        }
+        .quick-links button:hover {
+            background: #283593;
+        }
+        @media (max-width: 600px) {
+            .main {
+                max-width: 98vw;
+                padding: 0 2vw;
+            }
+            .card {
+                padding: 18px 14px 16px 14px;
+            }
+            .footer {
+                font-size: 0.92rem;
+                padding: 10px 0 8px 0;
+            }
+        }
+        @media (max-width: 400px) {
+            .input-row input[type="number"], .input-row select {
+                font-size: 0.95rem;
+            }
+            #startHour, #startMinute {
+                width: 10px;
+            }
+            .input-row {
+                gap: 4px;
+            }
         }
         .contact-sidebar {
             position: fixed;
             top: 0;
             right: 0;
-            width: 200px;
+            width: 260px;
+            max-width: 95vw;
             height: 100vh;
             background: #fff;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.04);
-            padding: 24px 12px 12px 12px;
+            box-shadow: -2px 0 16px rgba(26,35,126,0.10);
+            padding: 28px 18px 18px 18px;
             z-index: 2000;
             overflow-y: auto;
-            border-radius: 14px 0 0 14px;
+            border-radius: 16px 0 0 16px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            transition: right 0.3s;
+        }
+        .contact-sidebar h3 {
+            color: #1a237e;
+            margin: 0 0 12px 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            width: 100%;
+            text-align: left;
+        }
+        #contact-list > div {
+            border: 1px solid #e3e6ee;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            background: #f7f9fc;
+            position: relative;
+        }
+        #contact-list b {
+            color: #3949ab;
+        }
+        #add-contact-btn {
+            margin-top: 10px;
+            font-size: 1.2em;
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        #contact-form {
+            display: none;
+            margin-top: 12px;
+            width: 100%;
+        }
+        #contact-form input[type="text"] {
+            margin-bottom: 6px;
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #cfd8dc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        #contact-form button {
+            background: #3949ab;
+            color: #fff;
+            border: none;
+            padding: 5px 14px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        #contact-form button#cancel-edit-btn {
+            background: #aaa;
+        }
+        .contact-sidebar .contact-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+        }
+        .contact-sidebar .contact-actions svg {
+            vertical-align: middle;
+        }
+        @media (max-width: 700px) {
+            .contact-sidebar {
+                width: 90vw;
+                max-width: 320px;
+                height: 100vh;
+                left: auto;
+                right: 0;
+                top: 0;
+                bottom: auto;
+                border-radius: 16px 0 0 16px;
+                box-shadow: -2px 0 16px rgba(26,35,126,0.12);
+            }
         }
     </style>
 </head>
 <body>
-    <header style="width:100%; background:#1976d2; color:#fff; padding: 12px 0 6px 0; text-align:center; font-size:1.1rem; font-weight:700; letter-spacing:1px; box-shadow:0 2px 12px rgba(25,118,210,0.08); position:relative; display:flex; align-items:center; justify-content:center;">
-        <img src="https://images.seeklogo.com/logo-png/55/1/stratus-automation-logo-png_seeklogo-559561.png" alt="Stratus Automation Logo" style="height:48px; width:48px; margin-right:18px; vertical-align:middle; border-radius:8px; background:#fff; padding:4px; box-shadow:0 1px 6px rgba(0,0,0,0.07);">
-        <span style="flex:0 1 auto;">Stratus Automation</span>
+    <header class="header">
+        <img src="https://images.seeklogo.com/logo-png/55/1/stratus-automation-logo-png_seeklogo-559561.png" alt="Stratus Automation Logo" class="header-logo">
+        <span>Stratus Automation</span>
+        <span class="header-credit">Page by Hanif</span>
     </header>
-    <div class="main-flex" style="display: flex; flex-direction: row; justify-content: center; align-items: stretch; gap: 14px; margin-top: 40px; flex-wrap: wrap; width:100%; max-width:100vw; box-sizing:border-box;">
-        <div class="container calculator-box" style="margin: 0; min-width:340px; max-width:360px; flex:1; display:flex; flex-direction:column; align-items:stretch; padding: 20px 18px 20px 18px; gap: 10px;">
-            <div style="background:#f4f8fd; color:#1976d2; font-size:1.15rem; font-weight:600; border-radius:8px 8px 0 0; padding:12px 0 8px 0; text-align:center; margin-bottom: 0; box-shadow:none;">Working Hours & End Time</div>
-            <form id="workForm" onsubmit="return false;" style="flex:1 0 auto; display:flex; flex-direction:column; align-items:stretch; padding-top: 10px;">
-                <div style="display:flex; flex-direction:column; gap:14px;">
-                    <label style="display:flex; align-items:center; gap:12px;">
-                        <span style="min-width:90px;">Work Hours:</span>
-                        <input type="number" id="workHours" value="9.5" step="0.1" min="0" required style="flex:1; max-width:120px;">
-                    </label>
-                    <label style="display:flex; align-items:center; gap:12px;">
-                        <span style="min-width:90px;">Start Time:</span>
-                        <div class="input-row" style="margin-top:0;">
-                            <input type="number" id="startHour" min="1" max="12" value="7" required style="width:48px;"> :
-                            <input type="number" id="startMinute" min="0" max="59" value="00" required style="width:48px;">
-                            <select id="ampm">
-                                <option value="AM" selected>AM</option>
-                                <option value="PM">PM</option>
-                            </select>
-                        </div>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                        <span style="min-width:90px;">OT Hours:</span>
-                        <input type="number" id="otHours" value="1" step="0.1" min="0" required style="flex:1; max-width:120px;">
-                    </label>
-                </div>
-                <div id="result-area" style="margin-bottom:14px;">
-                    <div style="font-size:0.98em; color:#1976d2; margin-bottom:4px; text-align:left; font-weight:500; /* Match OT card spacing */">Result:</div>
-                    <div class="result" id="result" style="background:#e3f2fd; border:1.5px solid #90caf9; border-radius:8px; padding:16px 12px; color:#1a237e; font-size:1.08rem; text-align:center; min-height:32px; margin-top:0;">No result yet. Please enter your data and press Calculate.</div>
-                </div>
-                <button type="button" onclick="calculateTimes()" style="margin-top: 10px;">Calculate</button>
+    <main class="main">
+        <section class="card">
+            <div class="card-title">Working Hours &amp; End Time</div>
+            <form id="workForm" onsubmit="return false;">
+                <label>Work Hours:
+                    <input type="number" id="workHours" value="9.5" step="0.1" min="0" required>
+                </label>
+                <label style="display:flex; align-items:center; gap:12px; margin-top:12px;">
+                    <span style="min-width:90px;">Start Time:</span>
+                    <div class="input-row" style="margin-top:0;">
+                        <input type="number" id="startHour" min="1" max="12" value="7" required style="width:48px;"> :
+                        <input type="number" id="startMinute" min="0" max="59" value="00" required style="width:48px;">
+                        <select id="ampm">
+                            <option value="AM" selected>AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                </label>
+                <label>OT Hours:
+                    <input type="number" id="otHours" value="1" step="0.1" min="0" required>
+                </label>
+                <div class="result" id="result">No result yet. Please enter your data and press Calculate.</div>
+                <button type="button" onclick="calculateTimes()">Calculate</button>
             </form>
-        </div>
-        <div class="container calculator-box" style="margin: 0; min-width:340px; max-width:360px; flex:1; display:flex; flex-direction:column; align-items:stretch; padding: 20px 18px 20px 18px; gap: 10px;">
-            <div style="background:#f4f8fd; color:#1976d2; font-size:1.15rem; font-weight:600; border-radius:8px 8px 0 0; padding:12px 0 8px 0; text-align:center; margin-bottom: 0; box-shadow:none;">Overtime Pay Estimator</div>
+        </section>
+        <section class="card">
+            <div class="card-title">Overtime Pay Estimator</div>
             <form onsubmit="return false;" style="flex:1 0 auto; display:flex; flex-direction:column; align-items:stretch; padding-top: 10px;">
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom: 14px; font-weight:500; color:#333; flex-wrap:nowrap; white-space:nowrap;">
                     <span style="white-space:nowrap;">OT Hours:</span>
                     <input type="number" id="otHoursPay" value="1" step="0.1" min="0" required style="width:90px; flex-shrink:0; height:32px; font-size:1rem; padding:4px 8px; border-radius:6px; border:1px solid #cfd8dc; display:inline-block; vertical-align:middle;">
-                    <button id="ot-configure-btn" title="Configure OT Settings" style="background:#1976d2; color:#fff; border:none; border-radius:6px; height:32px; line-height:32px; padding:0 18px; font-size:1rem; font-weight:500; cursor:pointer; transition:background 0.2s; display:inline-block; vertical-align:middle; margin-left:8px; margin-top:-4px;">
+                    <button id="ot-configure-btn" title="Configure OT Settings" style="background:#3949ab; color:#fff; border:none; border-radius:6px; height:32px; line-height:32px; padding:0 18px; font-size:1rem; font-weight:500; cursor:pointer; transition:background 0.2s; display:inline-block; vertical-align:middle; margin-left:8px; margin-top:-4px;">
                         Configure
                     </button>
                 </div>
@@ -287,61 +340,58 @@
                 </div>
                 <button type="button" onclick="calculateOTPay()" style="background:#388e3c; margin-top: 10px;">Calculate OT Pay</button>
             </form>
-        </div>
-        <div class="container calculator-box" style="margin: 0; min-width:340px; max-width:360px; flex:1; display:flex; flex-direction:column; align-items:stretch; padding: 20px 18px 20px 18px; gap: 10px;">
-            <div style="background:#f4f8fd; color:#1976d2; font-size:1.15rem; font-weight:600; border-radius:8px 8px 0 0; padding:12px 0 8px 0; text-align:center; margin-bottom: 0; box-shadow:none;">Quick Links & Resources</div>
-            <div style="padding-top: 10px; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                <button onclick="window.open('https://www.renecosystem.com/ESS/MY/sasb/', '_blank')" style="background:#388e3c; margin-bottom: 14px; width:100%;">Open Company ESS Portal</button>
-                <span style="font-size:0.95em; color:#555; margin-bottom:18px;">(Clock-in, Payslip, OT, Leave, etc.)</span>
-                <hr style="margin: 22px 0 18px 0; border: none; border-top: 1px solid #e0e0e0; width:100%;">
-                <button onclick="window.open('https://stratusautomation.sharepoint.com/sites/CRBChangeReviewBoard/', '_blank')" style="background:#1976d2; width:100%;">Open CRB Submission Portal</button>
-                <span style="font-size:0.95em; color:#555;">(Submit Change Review Board requests)</span>
+        </section>
+        <!-- OT Settings Modal -->
+        <div id="ot-settings-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:3000; align-items:center; justify-content:center;">
+            <div style="background:#fff; border-radius:12px; padding:32px 28px; min-width:260px; max-width:90vw; box-shadow:0 4px 32px rgba(0,0,0,0.18); display:flex; flex-direction:column; align-items:center;">
+                <h3 style='margin-bottom:18px; color:#3949ab;'>OT Settings</h3>
+                <label style="margin-bottom:10px; color:#333;">OT Rate (RM/hr):
+                    <input type="number" id="modalOtRate" value="30" step="1" min="0" style="width:80px; margin-left:8px;">
+                </label>
+                <label style="margin-bottom:18px; color:#333;">OT Threshold (hrs):
+                    <input type="number" id="modalOtThreshold" value="104" step="1" min="0" style="width:80px; margin-left:8px;">
+                </label>
+                <div style="display:flex; gap:18px;">
+                    <button id="saveOtSettings" style="background:#3949ab; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;">Save</button>
+                    <button id="cancelOtSettings" style="background:#aaa; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;">Cancel</button>
+                </div>
             </div>
         </div>
-    </div>
-    <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
-    <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
-        <div style="display:flex; width:100%; align-items:center; position:relative;">
-            <h3 style="color: #2d3a4a; margin: 2px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Supplier Contact</h3>
-        </div>
-        <div id="contact-list" style="display:none;"></div>
-        <button id="add-contact-btn" style="margin-top: 10px; font-size: 1.2em; background: #388e3c; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display:inline-block;">+</button>
-        <form id="contact-form" style="display:none; margin-top: 12px;">
-            <input type="text" id="contact-pic" placeholder="PIC Name" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-company" placeholder="Company" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-brand" placeholder="Brand" required style="margin-bottom:4px; width: 120px;">
-            <input type="text" id="contact-number" placeholder="Contact Number" required style="margin-bottom:4px; width: 120px;">
-            <input type="hidden" id="contact-edit-index">
-            <button type="submit" style="background: #1976d2; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Save</button>
-            <button type="button" id="cancel-edit-btn" style="background: #aaa; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; margin-left: 8px;">Cancel</button>
-        </form>
-    </div>
-    <button id="phone-float-btn" class="float-btn"
+        <section class="quick-links">
+            <div class="quick-links-title">Quick Links &amp; Resources</div>
+            <button onclick="window.open('https://www.renecosystem.com/ESS/MY/sasb/', '_blank')">Open Company ESS Portal</button><br>
+            <span style="font-size:0.95em; color:#555;">(Clock-in, Payslip, OT, Leave, etc.)</span>
+            <hr style="margin: 18px 0 12px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <button onclick="window.open('https://stratusautomation.sharepoint.com/sites/CRBChangeReviewBoard/', '_blank')">Open CRB Submission Portal</button><br>
+            <span style="font-size:0.95em; color:#555;">(Submit Change Review Board requests)</span>
+        </section>
+    </main>
+    <footer class="footer">
+        &copy; 2024 Stratus Automation. All rights reserved.
+    </footer>
+    <button id="phone-float-btn"
+        style="position:fixed; right:24px; bottom:40px; background:#43a047; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
         title="Show Contacts">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="16" cy="16" r="16" fill="#43a047"/>
             <path d="M22.5 20.5c-1.5 0-3-.25-4.5-.75-1.5-.5-2.75-1.25-3.75-2.25s-1.75-2.25-2.25-3.75c-.5-1.5-.75-3-.75-4.5 0-.5.2-.9.6-1.2l2.2-2.2c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-1.1 1.1c.2.6.5 1.2.9 1.7.4.5.9.9 1.4 1.2l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0l-1.1-1.1c-.3.3-.7.3-1 0-.3-.3-.3-.7 0-1l1.1-1.1c-.3-.3-.7-.3-1 0l-2.2 2.2c-.3.3-.3.7 0 1l2.2 2.2c.3.3.7.3 1 0l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0z" fill="#fff"/>
         </svg>
     </button>
-    <button id="youtube-float-btn" class="float-btn" onclick="window.open('https://www.youtube.com', '_blank')" 
-        title="Open YouTube">
-        <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-            <circle cx="16" cy="16" r="16" fill="#ff0000"/>
-            <polygon points="13,11 24,16 13,21" fill="#fff"/>
-        </svg>
-    </button>
-    <button id="google-float-btn" class="float-btn" onclick="window.open('https://www.google.com', '_blank')" 
-        title="Open Google">
-        <svg width="40" height="40" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-            <g>
-                <circle cx="16" cy="16" r="16" fill="#8ecaff"/>
-                <path d="M23.6 16.2c0-.5-.1-.9-.2-1.3H16v2.6h4.3c-.2 1.1-1.3 3.1-4.3 3.1-2.6 0-4.7-2.2-4.7-4.8s2.1-4.8 4.7-4.8c1.5 0 2.5.6 3.1 1.2l2.1-2c-1.4-1.3-3.1-2.1-5.2-2.1-4 0-7.2 3.2-7.2 7.2s3.2 7.2 7.2 7.2c4.1 0 6.8-2.9 6.8-7 0-.5-.1-.9-.2-1.3z" fill="#fff"/>
-                <path d="M16 24c2.2 0 4.1-.7 5.5-2l-2.6-2c-.7.5-1.7.8-2.9.8-2.2 0-4-1.5-4.7-3.5H8.6v2.2C10 22.2 12.8 24 16 24z" fill="#34a853"/>
-                <path d="M11.3 17.3c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6v-2.2H8.6C8.2 13.8 8 14.9 8 16s.2 2.2.6 3.2l2.7-2z" fill="#fbbc05"/>
-                <path d="M16 11.5c1.2 0 2.3.4 3.1 1.2l2.1-2C19.9 9.2 18.1 8.5 16 8.5c-3.2 0-6 1.8-7.4 4.5l2.7 2c.7-2 2.5-3.5 4.7-3.5z" fill="#ea4335"/>
-            </g>
-        </svg>
-    </button>
+    <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
+    <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
+        <h3>Supplier Contact</h3>
+        <div id="contact-list" style="display:none;"></div>
+        <button id="add-contact-btn">+</button>
+        <form id="contact-form">
+            <input type="text" id="contact-pic" placeholder="PIC Name" required>
+            <input type="text" id="contact-company" placeholder="Company" required>
+            <input type="text" id="contact-brand" placeholder="Brand" required>
+            <input type="text" id="contact-number" placeholder="Contact Number" required>
+            <input type="hidden" id="contact-edit-index">
+            <button type="submit">Save</button>
+            <button type="button" id="cancel-edit-btn">Cancel</button>
+        </form>
+    </div>
     <script>
         function formatTime(hour24, minute) {
             let ampm = hour24 >= 12 ? 'PM' : 'AM';
@@ -349,42 +399,33 @@
             if (hour12 === 0) hour12 = 12;
             return `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`;
         }
-
         function calculateTimes() {
             const workHours = parseFloat(document.getElementById('workHours').value);
             let hour = parseInt(document.getElementById('startHour').value, 10);
             let minute = parseInt(document.getElementById('startMinute').value, 10);
             const ampm = document.getElementById('ampm').value;
             const otHours = parseFloat(document.getElementById('otHours').value);
-
             if (ampm === 'PM' && hour !== 12) hour += 12;
             if (ampm === 'AM' && hour === 12) hour = 0;
-
-            // Calculate end work time
             let totalMinutes = hour * 60 + minute + Math.round(workHours * 60);
             let endHour = Math.floor(totalMinutes / 60) % 24;
             let endMinute = totalMinutes % 60;
-
-            // Calculate end OT time
             let otMinutes = totalMinutes + Math.round(otHours * 60);
             let otHour = Math.floor(otMinutes / 60) % 24;
             let otMinute = otMinutes % 60;
-
-            // Output
             document.getElementById('result').innerHTML =
                 `<b>End Work Time:</b> ${formatTime(endHour, endMinute)}<br>` +
                 `<b>End OT Time:</b> ${formatTime(otHour, otMinute)}`;
         }
-
-        // OT Settings Modal Logic
+        // OT Settings Modal Logic (restored to previous functionality)
         const otGearBtn = document.getElementById('ot-configure-btn');
         const otSettingsModal = document.getElementById('ot-settings-modal');
         const modalOtRate = document.getElementById('modalOtRate');
         const modalOtThreshold = document.getElementById('modalOtThreshold');
         const saveOtSettings = document.getElementById('saveOtSettings');
         const cancelOtSettings = document.getElementById('cancelOtSettings');
-        let otRateValue = 30;
-        let otThresholdValue = 104;
+        let otRateValue = parseFloat(modalOtRate.value) || 30;
+        let otThresholdValue = parseFloat(modalOtThreshold.value) || 104;
         otGearBtn.onclick = function() {
             modalOtRate.value = otRateValue;
             modalOtThreshold.value = otThresholdValue;
@@ -396,10 +437,8 @@
         saveOtSettings.onclick = function() {
             otRateValue = parseFloat(modalOtRate.value) || 30;
             otThresholdValue = parseFloat(modalOtThreshold.value) || 104;
-            document.getElementById('otRate').value = otRateValue;
             otSettingsModal.style.display = 'none';
         };
-        // Update OT Pay calculation to use otThresholdValue
         function calculateOTPay() {
             const otRate = otRateValue;
             const otHours = parseFloat(document.getElementById('otHoursPay').value);
@@ -414,7 +453,6 @@
                 `<b>Total OT Pay:</b> RM${otPay.toFixed(2)}<br>` +
                 `<b>OT Hours Left (Threshold ${threshold}):</b> ${otLeft < 0 ? 0 : otLeft.toFixed(2)} hrs`;
         }
-
         // Loan Part Supplier Contact Section
         function renderContacts() {
             const list = document.getElementById('contact-list');
@@ -424,27 +462,26 @@
                 return;
             }
             list.innerHTML = contacts.map((c, i) =>
-                `<div style='border:1px solid #e0e0e0; border-radius:6px; padding:8px 10px; margin-bottom:7px; background:#f9f9f9; position:relative;'>
-                    <div>
+                `<div><div>
                         <b>PIC:</b> ${c.pic} <br>
                         <b>Company:</b> ${c.company} <br>
                         <b>Brand:</b> ${c.brand} <br>
                         <b>Contact:</b> <span id='contact-num-${i}' style='user-select:all;'>${c.number}</span>
                     </div>
-                    <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
-                        <button onclick='copyContactNumber(${i})' title='Copy Number' style='background:none; border:none; cursor:pointer; padding:2px;'>
-                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none' style='vertical-align:middle;'>
+                    <div class='contact-actions' style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
+                        <button onclick='copyContactNumber(${i})' title='Copy Number'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
                                 <rect x='6' y='6' width='12' height='14' rx='2' fill='#888'/>
                                 <rect x='4' y='4' width='12' height='14' rx='2' stroke='#888' stroke-width='1.5' fill='none'/>
                             </svg>
                         </button>
-                        <button onclick='editContact(${i})' title='Edit' style='background:none; border:none; cursor:pointer; padding:2px;'>
+                        <button onclick='editContact(${i})' title='Edit'>
                             <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
                                 <path d='M5 18.5V20h1.5l9.1-9.1-1.5-1.5L5 18.5z' fill='#ffa726'/>
                                 <path d='M17.7 8.04c.2-.2.2-.51 0-.71l-1-1a.5.5 0 0 0-.71 0l-1.09 1.09 1.5 1.5 1.09-1.09z' fill='#ffa726'/>
                             </svg>
                         </button>
-                        <button onclick='deleteContact(${i})' title='Delete' style='background:none; border:none; cursor:pointer; padding:2px;'>
+                        <button onclick='deleteContact(${i})' title='Delete'>
                             <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
                                 <path d='M6 7h12' stroke='#e53935' stroke-width='2' stroke-linecap='round'/>
                                 <rect x='9' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
@@ -504,7 +541,6 @@
             document.getElementById('contact-form').style.display = 'none';
             document.getElementById('add-contact-btn').style.display = 'inline-block';
         };
-        // Remove inline edit form logic, add modal for editing
         if (!document.getElementById('edit-modal')) {
             const modal = document.createElement('div');
             modal.id = 'edit-modal';
@@ -528,7 +564,7 @@
                         <input type='text' id='edit-brand' placeholder='Brand' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
                         <input type='text' id='edit-number' placeholder='Contact Number' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
                         <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
-                            <button type='submit' style='background:#1976d2; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Save</button>
+                            <button type='submit' style='background:#3949ab; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Save</button>
                             <button type='button' id='cancel-edit-modal' style='background:#aaa; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Cancel</button>
                         </div>
                     </form>
