@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-image: url('https://img.freepik.com/premium-vector/jungle-forest-landscape-ai-generated-8-bit-pixel-game-scene-with-tropical-trees-plants-rainforest-jungle-nature-vector-background-green-palms-exotic-trees-lianas-flowers-plants_8071-54923.jpg?w=2000');
+            background-image: url('https://img.freepik.com/free-photo/jungle-landscape-pixel-art-style_23-2151557071.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -17,7 +17,7 @@
         }
         .header {
             width: 100%;
-            background: rgba(26, 35, 126, 0.8); /* Added transparency for better visibility */
+            background: rgba(26, 35, 126, 0.8);
             color: #fff;
             padding: 18px 0 8px 0;
             text-align: center;
@@ -57,7 +57,7 @@
             gap: 28px;
         }
         .card {
-            background: rgba(255, 255, 255, 0.9); /* Added transparency for better visibility */
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 14px;
             box-shadow: 0 2px 12px rgba(26,35,126,0.06);
             padding: 26px 20px 22px 20px;
@@ -137,7 +137,7 @@
         }
         .footer {
             width: 100%;
-            background: rgba(26, 35, 126, 0.8); /* Added transparency for better visibility */
+            background: rgba(26, 35, 126, 0.8);
             color: #c5cae9;
             text-align: center;
             padding: 14px 0 10px 0;
@@ -146,7 +146,7 @@
             border-radius: 18px 18px 0 0;
         }
         .quick-links {
-            background: rgba(245, 247, 250, 0.9); /* Added transparency for better visibility */
+            background: rgba(245, 247, 250, 0.9);
             border-radius: 12px;
             padding: 18px 14px 14px 14px;
             margin-top: 18px;
@@ -366,4 +366,262 @@
             <span style="font-size:0.95em; color:#555;">(Clock-in, Payslip, OT, Leave, etc.)</span>
             <hr style="margin: 18px 0 12px 0; border: none; border-top: 1px solid #e0e0e0;">
             <button onclick="window.open('https://stratusautomation.sharepoint.com/sites/CRBChangeReviewBoard/', '_blank')">Open CRB Submission Portal</button><br>
-            <span style="font-size:0.95em; color:#555;">(Submit Change Review Board requests)</span
+            <span style="font-size:0.95em; color:#555;">(Submit Change Review Board requests)</span>
+        </section>
+    </main>
+    <footer class="footer">
+        &copy; 2024 Stratus Automation. All rights reserved.
+    </footer>
+    <script>
+        function formatTime(hour24, minute) {
+            let ampm = hour24 >= 12 ? 'PM' : 'AM';
+            let hour12 = hour24 % 12;
+            if (hour12 === 0) hour12 = 12;
+            return `${hour12.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} ${ampm}`;
+        }
+        function calculateTimes() {
+            const workHours = parseFloat(document.getElementById('workHours').value);
+            let hour = parseInt(document.getElementById('startHour').value, 10);
+            let minute = parseInt(document.getElementById('startMinute').value, 10);
+            const ampm = document.getElementById('ampm').value;
+            const otHours = parseFloat(document.getElementById('otHours').value);
+            if (ampm === 'PM' && hour !== 12) hour += 12;
+            if (ampm === 'AM' && hour === 12) hour = 0;
+            let totalMinutes = hour * 60 + minute + Math.round(workHours * 60);
+            let endHour = Math.floor(totalMinutes / 60) % 24;
+            let endMinute = totalMinutes % 60;
+            let otMinutes = totalMinutes + Math.round(otHours * 60);
+            let otHour = Math.floor(otMinutes / 60) % 24;
+            let otMinute = otMinutes % 60;
+            document.getElementById('result').innerHTML =
+                `<b>End Work Time:</b> ${formatTime(endHour, endMinute)}<br>` +
+                `<b>End OT Time:</b> ${formatTime(otHour, otMinute)}`;
+        }
+        const otGearBtn = document.getElementById('ot-configure-btn');
+        const otSettingsModal = document.getElementById('ot-settings-modal');
+        const modalOtRate = document.getElementById('modalOtRate');
+        const modalOtThreshold = document.getElementById('modalOtThreshold');
+        const saveOtSettings = document.getElementById('saveOtSettings');
+        const cancelOtSettings = document.getElementById('cancelOtSettings');
+        let otRateValue = parseFloat(modalOtRate.value) || 30;
+        let otThresholdValue = parseFloat(modalOtThreshold.value) || 104;
+        otGearBtn.onclick = function() {
+            modalOtRate.value = otRateValue;
+            modalOtThreshold.value = otThresholdValue;
+            otSettingsModal.style.display = 'flex';
+        };
+        cancelOtSettings.onclick = function() {
+            otSettingsModal.style.display = 'none';
+        };
+        saveOtSettings.onclick = function() {
+            otRateValue = parseFloat(modalOtRate.value) || 30;
+            otThresholdValue = parseFloat(modalOtThreshold.value) || 104;
+            otSettingsModal.style.display = 'none';
+        };
+        function calculateOTPay() {
+            const otRate = otRateValue;
+            const otHours = parseFloat(document.getElementById('otHoursPay').value);
+            const threshold = otThresholdValue;
+            if (isNaN(otRate) || isNaN(otHours)) {
+                document.getElementById('otPayResult').innerHTML = '<span style="color:#b71c1c;">Please enter valid OT hours and rate.</span>';
+                return;
+            }
+            const otPay = otRate * otHours;
+            const otLeft = threshold - otHours;
+            document.getElementById('otPayResult').innerHTML =
+                `<b>Total OT Pay:</b> RM${otPay.toFixed(2)}<br>` +
+                `<b>OT Hours Left (Threshold ${threshold}):</b> ${otLeft < 0 ? 0 : otLeft.toFixed(2)} hrs`;
+        }
+    </script>
+    <button id="phone-float-btn"
+        style="position:fixed; right:24px; bottom:40px; background:#43a047; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
+        title="Show Contacts">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#43a047"/>
+            <path d="M22.5 20.5c-1.5 0-3-.25-4.5-.75-1.5-.5-2.75-1.25-3.75-2.25s-1.75-2.25-2.25-3.75c-.5-1.5-.75-3-.75-4.5 0-.5.2-.9.6-1.2l2.2-2.2c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-1.1 1.1c.2.6.5 1.2.9 1.7.4.5.9.9 1.4 1.2l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0l-1.1-1.1c-.3.3-.7.3-1 0-.3-.3-.3-.7 0-1l1.1-1.1c-.3-.3-.7-.3-1 0l-2.2 2.2c-.3.3-.3.7 0 1l2.2 2.2c.3.3.7.3 1 0l1.1-1.1c.3-.3.7-.3 1 0l2.2 2.2c.3.3.3.7 0 1l-2.2 2.2c-.3.3-.7.3-1 0z" fill="#fff"/>
+        </svg>
+    </button>
+    <div id="contact-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
+    <div class="contact-sidebar" id="contact-sidebar" style="display:none;">
+        <h3>Supplier Contact</h3>
+        <div id="contact-list" style="display:none;"></div>
+        <button id="add-contact-btn">+</button>
+        <form id="contact-form">
+            <input type="text" id="contact-pic" placeholder="PIC Name" required>
+            <input type="text" id="contact-company" placeholder="Company" required>
+            <input type="text" id="contact-brand" placeholder="Brand" required>
+            <input type="text" id="contact-number" placeholder="Contact Number" required>
+            <input type="hidden" id="contact-edit-index">
+            <button type="submit">Save</button>
+            <button type="button" id="cancel-edit-btn">Cancel</button>
+        </form>
+    </div>
+    <script>
+        function renderContacts() {
+            const list = document.getElementById('contact-list');
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            if (contacts.length === 0) {
+                list.innerHTML = '<div style="color:#888;">No contacts saved.</div>';
+                return;
+            }
+            list.innerHTML = contacts.map((c, i) =>
+                `<div><div>
+                        <b>PIC:</b> ${c.pic} <br>
+                        <b>Company:</b> ${c.company} <br>
+                        <b>Brand:</b> ${c.brand} <br>
+                        <b>Contact:</b> <span id='contact-num-${i}' style='user-select:all;'>${c.number}</span>
+                    </div>
+                    <div class='contact-actions' style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
+                        <button onclick='copyContactNumber(${i})' title='Copy Number'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                                <rect x='6' y='6' width='12' height='14' rx='2' fill='#888'/>
+                                <rect x='4' y='4' width='12' height='14' rx='2' stroke='#888' stroke-width='1.5' fill='none'/>
+                            </svg>
+                        </button>
+                        <button onclick='editContact(${i})' title='Edit'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                                <path d='M5 18.5V20h1.5l9.1-9.1-1.5-1.5L5 18.5z' fill='#ffa726'/>
+                                <path d='M17.7 8.04c.2-.2.2-.51 0-.71l-1-1a.5.5 0 0 0-.71 0l-1.09 1.09 1.5 1.5 1.09-1.09z' fill='#ffa726'/>
+                            </svg>
+                        </button>
+                        <button onclick='deleteContact(${i})' title='Delete'>
+                            <svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
+                                <path d='M6 7h12' stroke='#e53935' stroke-width='2' stroke-linecap='round'/>
+                                <rect x='9' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
+                                <rect x='13.5' y='10' width='1.5' height='7' rx='.75' fill='#e53935'/>
+                                <rect x='5' y='7' width='14' height='2' rx='1' fill='#e53935'/>
+                                <rect x='8' y='4' width='8' height='2' rx='1' fill='#e53935'/>
+                                <rect x='7' y='9' width='10' height='10' rx='2' stroke='#e53935' stroke-width='1.5' fill='none'/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>`
+            ).join('');
+        }
+        const phoneBtn = document.getElementById('phone-float-btn');
+        const sidebar = document.getElementById('contact-sidebar');
+        const overlay = document.getElementById('contact-overlay');
+        phoneBtn.onclick = function() {
+            sidebar.style.display = 'flex';
+            overlay.style.display = 'block';
+            renderContacts();
+            document.getElementById('contact-list').style.display = 'block';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        overlay.onclick = function(e) {
+            sidebar.style.display = 'none';
+            overlay.style.display = 'none';
+            document.getElementById('contact-form').style.display = 'none';
+        };
+        document.getElementById('add-contact-btn').onclick = function() {
+            document.getElementById('contact-form').style.display = 'block';
+            this.style.display = 'none';
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-edit-index').value = '';
+        };
+        document.getElementById('contact-form').onsubmit = function(e) {
+            e.preventDefault();
+            const pic = document.getElementById('contact-pic').value.trim();
+            const company = document.getElementById('contact-company').value.trim();
+            const brand = document.getElementById('contact-brand').value.trim();
+            const number = document.getElementById('contact-number').value.trim();
+            const editIndex = document.getElementById('contact-edit-index').value;
+            if (!pic || !company || !brand || !number) return;
+            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            if (editIndex !== '') {
+                contacts[editIndex] = { pic, company, brand, number };
+            } else {
+                contacts.push({ pic, company, brand, number });
+            }
+            localStorage.setItem('loanContacts', JSON.stringify(contacts));
+            renderContacts();
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-form').style.display = 'none';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        document.getElementById('cancel-edit-btn').onclick = function() {
+            document.getElementById('contact-form').reset();
+            document.getElementById('contact-form').style.display = 'none';
+            document.getElementById('add-contact-btn').style.display = 'inline-block';
+        };
+        if (!document.getElementById('edit-modal')) {
+            const modal = document.createElement('div');
+            modal.id = 'edit-modal';
+            modal.style.display = 'none';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'rgba(0,0,0,0.25)';
+            modal.style.zIndex = '3000';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.innerHTML = `
+                <div style="background:#fff; border-radius:12px; padding:32px 28px; min-width:280px; max-width:90vw; box-shadow:0 4px 32px rgba(0,0,0,0.18); display:flex; flex-direction:column; align-items:center;">
+                    <h3 style='margin-bottom:18px; color:#2d3a4a;'>Edit Contact</h3>
+                    <form id='edit-contact-form' style='width:100%; display:flex; flex-direction:column; gap:10px;'>
+                        <input type='text' id='edit-pic' placeholder='PIC Name' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-company' placeholder='Company' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-brand' placeholder='Brand' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <input type='text' id='edit-number' placeholder='Contact Number' required style='padding:7px 10px; border-radius:6px; border:1px solid #bbb;'>
+                        <div style='display:flex; justify-content:center; gap:18px; margin-top:10px;'>
+                            <button type='submit' style='background:#3949ab; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Save</button>
+                            <button type='button' id='cancel-edit-modal' style='background:#aaa; color:#fff; border:none; border-radius:6px; padding:7px 24px; font-size:1em;'>Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        window.editContact = function(index) {
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const c = contacts[index];
+            const modal = document.getElementById('edit-modal');
+            modal.style.display = 'flex';
+            document.getElementById('edit-pic').value = c.pic;
+            document.getElementById('edit-company').value = c.company;
+            document.getElementById('edit-brand').value = c.brand;
+            document.getElementById('edit-number').value = c.number;
+            document.getElementById('edit-contact-form').onsubmit = function(e) {
+                e.preventDefault();
+                const pic = document.getElementById('edit-pic').value.trim();
+                const company = document.getElementById('edit-company').value.trim();
+                const brand = document.getElementById('edit-brand').value.trim();
+                const number = document.getElementById('edit-number').value.trim();
+                if (!pic || !company || !brand || !number) return;
+                contacts[index] = { pic, company, brand, number };
+                localStorage.setItem('loanContacts', JSON.stringify(contacts));
+                renderContacts();
+                modal.style.display = 'none';
+            };
+            document.getElementById('cancel-edit-modal').onclick = function() {
+                document.getElementById('edit-contact-form').reset();
+                modal.style.display = 'none';
+            };
+        };
+        window.deleteContact = function(index) {
+            let contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const c = contacts[index];
+            const msg = `Delete this contact?\n\nPIC: ${c.pic}\nCompany: ${c.company}\nBrand: ${c.brand}\nContact: ${c.number}`;
+            if (confirm(msg)) {
+                contacts.splice(index, 1);
+                localStorage.setItem('loanContacts', JSON.stringify(contacts));
+                renderContacts();
+            }
+        };
+        window.copyContactNumber = function(index) {
+            const contacts = JSON.parse(localStorage.getItem('loanContacts') || '[]');
+            const number = contacts[index].number;
+            navigator.clipboard.writeText(number).then(() => {
+            });
+        };
+        window.addEventListener('DOMContentLoaded', function() {
+            renderContacts();
+            var modal = document.getElementById('edit-modal');
+            if (modal) modal.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
