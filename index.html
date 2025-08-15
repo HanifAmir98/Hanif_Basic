@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background-image: url('https://img.freepik.com/free-photo/jungle-landscape-pixel-art-style_23-2151557071.jpg');
+            background-image: url('https://images.wallpaperscraft.com/image/single/code_text_colorful_140555_2160x3840.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -360,6 +360,7 @@
                 </div>
             </div>
         </div>
+        <!-- Background Settings moved to a toggleable sidebar; opened via the floating gear button. -->
         <section class="quick-links">
             <div class="quick-links-title">Quick Links &amp; Resources</div>
             <button onclick="window.open('https://www.renecosystem.com/ESS/MY/sasb/', '_blank')">Open Company ESS Portal</button><br>
@@ -432,9 +433,133 @@
                 `<b>Total OT Pay:</b> RM${otPay.toFixed(2)}<br>` +
                 `<b>OT Hours Left (Threshold ${threshold}):</b> ${otLeft < 0 ? 0 : otLeft.toFixed(2)} hrs`;
         }
+        window.addEventListener('DOMContentLoaded', function setupBackgroundSettings(){
+            const bgUrlInput = document.getElementById('bg-url-input');
+            const applyBtn = document.getElementById('bg-apply-btn');
+            const resetBtn = document.getElementById('bg-reset-btn');
+            const dropZone = document.getElementById('bg-drop-zone');
+            const fileInput = document.getElementById('bg-file-input');
+            if (!applyBtn || !dropZone) return;
+            const defaultBg = getComputedStyle(document.body).backgroundImage;
+            try {
+                const stored = localStorage.getItem('customBg');
+                if (stored) {
+                    document.body.style.backgroundImage = `url('${stored.replace(/'/g, "\\'")}')`;
+                    if (bgUrlInput) bgUrlInput.value = stored;
+                }
+            } catch (e) {}
+            function applyBg(url) {
+                if (!url) return;
+                document.body.style.backgroundImage = `url('${url.replace(/'/g, "\\'")}')`;
+                try { localStorage.setItem('customBg', url); } catch (e) {}
+                if (bgUrlInput) bgUrlInput.value = url;
+            }
+            applyBtn.onclick = function() {
+                const url = (bgUrlInput && bgUrlInput.value || '').trim();
+                if (url) applyBg(url);
+            };
+            resetBtn.onclick = function() {
+                try { localStorage.removeItem('customBg'); } catch (e) {}
+                document.body.style.backgroundImage = defaultBg;
+                if (bgUrlInput) bgUrlInput.value = '';
+            };
+            dropZone.onclick = function() { if (fileInput) fileInput.click(); };
+            fileInput.onchange = function(event) {
+                const file = event.target.files && event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) { applyBg(ev.target.result); };
+                reader.readAsDataURL(file);
+                fileInput.value = '';
+            };
+            function handlePaste(ev) {
+                const items = ev.clipboardData && ev.clipboardData.items;
+                if (items && items.length) {
+                    for (let i = 0; i < items.length; i++) {
+                        const it = items[i];
+                        if (it.type && it.type.indexOf('image') !== -1) {
+                            const file = it.getAsFile();
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function(e) { applyBg(e.target.result); };
+                                reader.readAsDataURL(file);
+                                ev.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                    const text = ev.clipboardData.getData('text');
+                    if (text && /^https?:\/\//i.test(text)) {
+                        applyBg(text.trim());
+                        ev.preventDefault();
+                        return;
+                    }
+                }
+            }
+            dropZone.addEventListener('paste', handlePaste);
+            document.addEventListener('paste', function(ev){
+                if (document.activeElement === bgUrlInput) {
+                    handlePaste(ev);
+                }
+            });
+            dropZone.addEventListener('dragover', function(e){ e.preventDefault(); dropZone.style.borderColor = '#3949ab'; });
+            dropZone.addEventListener('dragleave', function(){ dropZone.style.borderColor = '#cfd8dc'; });
+            dropZone.addEventListener('drop', function(e){
+                e.preventDefault();
+                dropZone.style.borderColor = '#cfd8dc';
+                const files = e.dataTransfer.files;
+                if (files && files.length && /^image\//.test(files[0].type)) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) { applyBg(ev.target.result); };
+                    reader.readAsDataURL(files[0]);
+                } else {
+                    const text = e.dataTransfer.getData('text');
+                    if (text) applyBg(text.trim());
+                }
+            });
+        });
+    </script>
+    <button id="bg-float-btn"
+        style="position:fixed; right:92px; bottom:40px; background:#3949ab; color:#fff; border:2px solid #fff; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 0 0 3px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.2); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
+        title="Background Settings">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.14,12.94a7.43,7.43,0,0,0,.06-1l1.64-1.28a.5.5,0,0,0,.12-.64l-1.56-2.7a.5.5,0,0,0-.6-.22l-1.93.78a7,7,0,0,0-.86-.5l-.3-2.06A.5.5,0,0,0,14.25,4H9.75a.5.5,0,0,0-.49.42L9,6.48a7,7,0,0,0-.86.5L6.21,6.2a.5.5,0,0,0-.6.22L4.05,9.12a.5.5,0,0,0,.12.64L5.81,11a7.43,7.43,0,0,0-.06,1,7.43,7.43,0,0,0,.06,1l-1.64,1.28a.5.5,0,0,0-.12.64l1.56,2.7a.5.5,0,0,0,.6.22l1.93-.78a7,7,0,0,0,.86.5l.3,2.06a.5.5,0,0,0,.49.42h4.5a.5.5,0,0,0,.49-.42l.3-2.06a7,7,0,0,0,.86-.5l1.93.78a.5.5,0,0,0,.6-.22l1.56-2.7a.5.5,0,0,0-.12-.64L19.14,13.94A7.43,7.43,0,0,0,19.14,12.94ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" fill="#fff"/>
+        </svg>
+    </button>
+    <div id="bg-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1999;"></div>
+    <div class="contact-sidebar" id="bg-sidebar" style="display:none;">
+        <h3>Background Settings</h3>
+        <div style="width:100%">
+            <label style="display:block; margin-bottom:8px;">Image URL:
+                <input type="text" id="bg-url-input" placeholder="https://... or data:image/..." style="width:100%; max-width:100%;">
+            </label>
+            <button type="button" id="bg-apply-btn">Apply Background</button>
+            <button type="button" id="bg-reset-btn" style="background:#aaa;">Reset to Default</button>
+            <div id="bg-drop-zone" style="margin-top:12px; padding:14px; border:2px dashed #cfd8dc; border-radius:8px; text-align:center; color:#455a64; background:#fafbff; cursor:pointer;">
+                Paste an image here (Ctrl+V) or click to upload
+            </div>
+            <input type="file" id="bg-file-input" accept="image/*" style="display:none;">
+        </div>
+        <div style="font-size:0.85rem; color:#607d8b; margin-top:8px;">Tip: Large, subtle images work best. Saved locally on this device.</div>
+    </div>
+    <script>
+        (function wireBgSidebar(){
+            const btn = document.getElementById('bg-float-btn');
+            const sidebar = document.getElementById('bg-sidebar');
+            const overlay = document.getElementById('bg-overlay');
+            if (!btn || !sidebar || !overlay) return;
+            btn.onclick = function(){
+                sidebar.style.display = 'flex';
+                overlay.style.display = 'block';
+            };
+            overlay.onclick = function(){
+                sidebar.style.display = 'none';
+                overlay.style.display = 'none';
+            };
+        })();
     </script>
     <button id="phone-float-btn"
-        style="position:fixed; right:24px; bottom:40px; background:#43a047; color:#fff; border:none; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
+        style="position:fixed; right:24px; bottom:40px; background:#43a047; color:#fff; border:2px solid #fff; border-radius:50%; width:56px; height:56px; font-size:2rem; box-shadow:0 0 0 3px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.2); cursor:pointer; z-index:1000; display:flex; align-items:center; justify-content:center; padding:0;"
         title="Show Contacts">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="16" cy="16" r="16" fill="#43a047"/>
